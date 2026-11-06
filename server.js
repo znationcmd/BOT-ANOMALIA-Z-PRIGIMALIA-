@@ -1,4 +1,5 @@
-import express from 'express';\nimport fs from 'node:fs/promises';
+import express from 'express';
+import fs from 'node:fs/promises';
 import crypto from 'node:crypto';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
