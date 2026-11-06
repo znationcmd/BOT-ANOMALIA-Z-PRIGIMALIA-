@@ -34,18 +34,17 @@
   <div class="nav-search"><span>⌕</span><input id="navSearch" type="search" placeholder="Rechercher un module..." aria-label="Rechercher un module"></div>
   <nav id="navigation" class="nav-scroll" aria-label="Modules du Dashboard"></nav>
   <div class="sidebar-footer">
-   <a class="button primary bot-invite-side" href="/api/invite" target="_blank" rel="noopener noreferrer" aria-label="Inviter le bot ANOMALIA’Z sur un serveur Discord">⊕ Inviter le bot Discord</a>
+   <button type="button" class="button secondary sidebar-app-install" id="installAppMenu" title="Installer ou ouvrir l’application ANOMALIA’Z">↓ Installer l’application</button>
    <div class="studio-prompt"><span>◈</span><div><strong>ANOMALIA ÉDITOR</strong><small>Conception du monde et assets</small></div><button data-jump="editor" aria-label="Ouvrir l'éditeur">↗</button></div>
    <div class="smallprint">© 2026 CMD STUDIO · PRIGIMALIA</div>
   </div>
  </aside>
  <div class="main-wrap">
   <header class="topbar">
-   <div class="topbar-left"><button class="mobile-menu" id="mobileMenu" aria-label="Ouvrir le menu" aria-controls="sidebar" aria-expanded="false"><span aria-hidden="true">☰</span><span class="mobile-control-label">Menu</span></button><div class="crumb">CMD STUDIO <span>/</span> <strong id="crumb">OVERVIEW</strong></div></div>
+   <div class="topbar-left"><button class="mobile-menu" id="mobileMenu" aria-label="Ouvrir le menu" aria-controls="sidebar" aria-expanded="false"><span aria-hidden="true">☰</span><span class="mobile-control-label">Menu</span></button><div class="topbar-brand" aria-label="ANOMALIA’Z CMD CONTROL"><strong>ANOMALIA’Z</strong><small>CMD CONTROL</small></div><div class="crumb">CMD STUDIO <span>/</span> <strong id="crumb">OVERVIEW</strong></div></div>
    <div class="topbar-right"><span class="environment">● PRODUCTION</span><a class="button small primary bot-invite-top" href="/api/invite" target="_blank" rel="noopener noreferrer">⊕ Inviter le bot</a><button id="installApp" class="button small pwa-install" title="Installer sur ordinateur ou téléphone">⬇ INSTALLER L’APP</button><span id="updateNotice" class="update-notice" hidden></span><span id="clock">--:--</span><button class="icon-button" id="refreshBtn" title="Actualiser les données" aria-label="Actualiser les données"><span aria-hidden="true">↻</span><span class="mobile-control-label">Actualiser</span></button><button class="user-badge" id="userBadge" title="Connexion et session Discord" aria-label="Connexion et session Discord"><span class="avatar-circle" aria-hidden="true">✦</span><span class="mobile-control-label">Discord</span><span id="userLabel">Connexion Discord</span></button></div>
    <nav class="mobile-quicknav" aria-label="Accès rapide aux modules">
     <a href="#overview">⌂ Accueil</a>
-    <a class="quicknav-invite" href="/api/invite" target="_blank" rel="noopener noreferrer">⊕ Inviter</a>
     <a href="#servers">▣ Serveurs</a>
     <a href="#whitelist">⛨ Whitelist</a>
     <a href="#shop">◆ Boutique</a>
@@ -53,6 +52,7 @@
     <a href="#rp">♜ RP</a>
     <a href="#editor">◈ Éditor</a>
     <a href="#tools">⚒ Tools</a>
+    <a class="quicknav-invite" href="/api/invite" target="_blank" rel="noopener noreferrer">⊕ Inviter</a>
    </nav>
   </header>
   <main id="main" class="main-content" tabindex="-1">
