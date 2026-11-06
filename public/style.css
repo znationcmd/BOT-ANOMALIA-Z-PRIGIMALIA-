@@ -54,3 +54,75 @@ a{color:inherit;text-decoration:none}a:hover{color:#f6dda4}button:disabled{opaci
 .metric:after{background:linear-gradient(90deg,#ffb52f,#ffe37d,transparent)}
 .feature-card:hover{border-color:#e9aa3b85}
 .input:focus,.field input:focus,.field select:focus,.field textarea:focus{border-color:#ffc250;box-shadow:0 0 0 3px #ffbe4d25}
+
+
+/* ANOMALIA’Z CINEMATIC PWA — user-supplied key art, amber metals and tactile buttons. */
+[hidden]{display:none!important}
+html{min-width:320px}
+body{background:#080807;color:#fff1d7}
+.app-shell{position:relative;background:transparent}
+.world-backdrop{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;overflow:hidden}
+.world-backdrop img{width:100%;height:100%;object-fit:cover;object-position:50% 44%;filter:saturate(1.1) contrast(1.02)}
+.world-backdrop:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#090909e3 0%,#0d0c0caa 31%,#0b0c0a9c 70%,#0c0b0bc2 100%),linear-gradient(180deg,#05050536 0%,#050505aa 100%)}
+.main-wrap{background:linear-gradient(160deg,#08070752,#0a08066a)}
+.sidebar{background:linear-gradient(160deg,#130f0df5 0%,#110e0de9 60%,#090907f8 100%);border-right:1px solid #d2963450;box-shadow:6px 0 44px #000b}
+.topbar{background:#0e0c09df;border-bottom:1px solid #c58b3055;box-shadow:0 3px 18px #0006}
+.ambient{opacity:.35}
+.haze-a{background:#ffad2b58}.haze-b{background:#c2620c52}
+.brand-mark{border-radius:15px;overflow:hidden;border:1px solid #ffc05d73;box-shadow:0 0 16px #e98f3833}
+.brand-mark img{object-fit:cover}
+.brand-text b span,.brand-text small{color:#ffbc4a}
+.nav-title{color:#f1b869a6}
+.nav-link{border:1px solid transparent;transition:background .18s,box-shadow .18s,color .18s,transform .18s}
+.nav-link:hover{transform:translateX(2px);background:#e592241b;color:#ffddb2;border-color:#fbbb4d39;box-shadow:0 0 15px #dc851519}
+.nav-link.active{background:linear-gradient(105deg,#a75e2445,#e7ab3227);color:#ffedc7;border:1px solid #eda84691;box-shadow:inset 0 2px 0 #ffe2ae22,0 0 17px #efa23c44}
+.nav-link.active .nav-symbol{color:#ffd26e;text-shadow:0 0 11px #ffc261}
+.nav-link.active:before{background:#ffcf6b;box-shadow:0 0 20px #ffb12b}
+.world-state,.studio-prompt,.card,.metric,.feature-card{backdrop-filter:blur(15px)}
+.card,.metric,.feature-card{background:linear-gradient(145deg,#1c1612ea,#100f0eee);border:1px solid #d5a6533a;box-shadow:inset 0 1px 0 #ffeec00c,0 9px 30px #0008}
+.card:hover,.metric:hover{border-color:#edb24d51}
+.feature-card{position:relative;overflow:hidden}
+.feature-card:hover{transform:translateY(-4px);background:linear-gradient(145deg,#3a251bcf,#15110fe8);border-color:#ffbd53a3;box-shadow:0 8px 32px #0009,0 0 32px #ffae2927}
+.feature-card .feature-icon{color:#ffc55e;text-shadow:0 0 15px #ffb84a4a}
+.feature-card .feature-link{color:#ffd16f}
+.hero{border:1px solid #fbc76895;min-height:clamp(360px,39vw,610px);
+ background:linear-gradient(90deg,#0a0909dc 0%,#11100e9e 32%,#0e0c0c40 70%,#120d0c3b),url('/media/anomalia-world.webp') center 48% / cover;
+ box-shadow:inset 0 0 50px #0008,0 18px 50px #000b,0 0 22px #ffb2451e}
+.hero:before{opacity:.18}
+.hero:after{border-color:#ffbd4945;box-shadow:0 0 0 45px #ffca1407,0 0 0 90px #ffb71704}
+.hero-content{max-width:700px;background:linear-gradient(90deg,#0d0c0ba8,#1a100940,transparent);padding:38px 48px;border-radius:14px}
+.hero h1{font-family:Impact,'Arial Narrow',system-ui,sans-serif;font-weight:950;letter-spacing:.045em;font-size:clamp(44px,5vw,88px);text-shadow:0 4px 12px #000,0 0 21px #000d}
+.hero h1 span{color:#ffcf5d;text-shadow:0 0 24px #ff9b3288}
+.hero p{color:#ffe3be;text-shadow:0 2px 7px #000}
+.hero-visual{display:none}
+.hero .microtag,.section-overline,.header-kicker{color:#ffc766}
+.button,.icon-button,.studio-prompt button,.user-badge,.table-actions button{position:relative;
+ transition:transform .17s ease-out,box-shadow .17s ease-out,filter .17s ease-out,background .17s ease-out;
+ box-shadow:inset 0 2px 0 #ffffff22,inset 0 -2px 0 #0007,0 4px 0 #1a110a,0 9px 18px #0006;
+ border:1px solid #fbb64f59;transform:translateY(0);will-change:transform}
+.button:hover,.icon-button:hover,.studio-prompt button:hover,.table-actions button:hover{
+ filter:brightness(1.15);border-color:#ffcd68;box-shadow:inset 0 2px 0 #fff5cd2e,inset 0 -2px 0 #0007,0 4px 0 #2c1708,0 9px 20px #0008,0 0 22px #ffaa2859}
+.button:active,.button.is-pressed,.icon-button:active,.icon-button.is-pressed,.studio-prompt button:active,.table-actions button:active{
+ transform:translateY(4px) scale(.987);filter:brightness(1.28);
+ box-shadow:inset 0 0 12px #ffe08f70,inset 0 2px 1px #fff5a470,0 0 15px #ffc550c0,0 0 39px #ff971477;outline-color:#ffce69}
+.button.primary{background:linear-gradient(175deg,#ffe189 0%,#ffc146 26%,#ed8c1d 70%,#bb5911 100%);
+ color:#2c1707;font-weight:900;border-color:#ffda76;
+ box-shadow:inset 0 3px 0 #fff3b38c,inset 0 -3px 0 #87420b88,0 6px 0 #713907,0 12px 22px #050402b3,0 0 18px #fa9f1d50}
+.button.primary:hover{box-shadow:inset 0 3px 0 #fff6c29c,inset 0 -3px 0 #90410788,0 6px 0 #7b3d05,0 12px 24px #000b,0 0 27px #ffc1458f}
+.button.primary:active,.button.primary.is-pressed{transform:translateY(5px) scale(.985);
+ background:linear-gradient(180deg,#fff2aa,#ffcc65,#ffac25);box-shadow:inset 0 3px 12px #fff6ca,0 1px 0 #7b3e08,0 0 21px #ffc851eb,0 0 52px #ff9318ab}
+.button.is-lit,.icon-button.is-lit{animation:flame-glow .85s ease-out}
+@keyframes flame-glow{0%{filter:brightness(1.42);box-shadow:0 0 6px #ffecb5,0 0 26px #ffb521,0 0 56px #ff982b}100%{filter:brightness(1);box-shadow:0 0 0 #0000}}
+.pwa-action{white-space:nowrap;min-height:36px;padding:8px 11px;border-color:#e2a7439c;font-size:11px;background:linear-gradient(140deg,#4a300f,#251b10);color:#ffd68a;font-weight:800}
+.pwa-action.update-action{border-color:#ffe06a;color:#ffe59f;animation:install-pulse 2s ease-in-out infinite}
+@keyframes install-pulse{0%,100%{box-shadow:0 0 10px #ffb02022}50%{box-shadow:0 0 23px #ffb43c88}}
+.pwa-status{position:fixed;bottom:77px;right:20px;z-index:29;padding:13px 16px;background:#1b150eea;color:#ffdfae;border:1px solid #ffc45f7c;border-radius:10px;max-width:330px;font-size:12px;box-shadow:0 8px 30px #000b}
+.modal-card{background:linear-gradient(145deg,#241a11,#11100c);border-color:#f1ab5282}
+.field input:focus,.field select:focus,.field textarea:focus,.input:focus{border-color:#ffcd70;box-shadow:0 0 0 3px #fcb5412b}
+.login-card{background:linear-gradient(165deg,#35200cdb,#0e0e0de9);border-color:#e9b25678}
+.toast{background:#251907;border-color:#ffbc54;color:#fff0cc}
+@media(min-width:2400px){.hero{background-image:linear-gradient(90deg,#0a0909cf 0%,#11100e80 32%,#0e0c0c38 70%,#120d0c3b),url('/media/anomalia-world-4k.webp')}}
+@media(min-width:5200px){.hero{background-image:linear-gradient(90deg,#0a0909cf 0%,#11100e80 32%,#0e0c0c38 70%,#120d0c3b),url('/media/anomalia-world-8k.webp')}}
+@media(max-width:900px){.world-backdrop img{object-position:52% center}.topbar{height:72px}.main-wrap{background:#0b0909b7}.sidebar{backdrop-filter:blur(25px)}.hero{min-height:410px;background-position:52% center}.hero-content{padding:25px}.pwa-action{font-size:10px}.pwa-status{bottom:67px}}
+@media(max-width:640px){.topbar{padding:0 10px}.topbar-right{gap:6px}.pwa-action{min-height:32px;padding:7px 8px}.hero{min-height:380px;background-position:53% center}.hero-content{background:#0c0a09a9;padding:18px}.hero h1{font-size:clamp(34px,10vw,48px)}.hero p{font-size:12px}.user-badge{max-width:38px;padding:5px}.user-badge #userLabel{display:none}.main-content{padding:16px 10px 40px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
