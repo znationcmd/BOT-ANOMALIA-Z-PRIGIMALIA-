@@ -33,10 +33,14 @@ async function api(path,opts={}){
 function renderNavigation(){
  const nav=$('#navigation'),term=String($('#navSearch')?.value||'').trim().toLowerCase();
  if(!state.catalog)return;
- nav.innerHTML=state.catalog.groups.map(group=>{
+ const openGroups=new Set([...nav.querySelectorAll('details.nav-group[open]')].map(e=>e.dataset.group));
+ const firstLoad=!nav.querySelector('details.nav-group');
+ nav.innerHTML=state.catalog.groups.map((group,index)=>{
   const modules=group.modules.filter(id=>title(id).toLowerCase().includes(term));
   if(!modules.length)return '';
-  return `<div class="nav-title">${html(group.title)}</div>`+modules.map(id=>`<a class="nav-link ${id===state.module?'active':''}" href="#${html(id)}" data-menu="${html(id)}"><span class="nav-symbol">${sym[id]||'•'}</span><span>${html(title(id))}</span><span class="nav-arrow">›</span></a>`).join('');
+  const expanded=Boolean(term||openGroups.has(group.id)||group.modules.includes(state.module)||(firstLoad&&index===0));
+  const links=modules.map(id=>'<a class="nav-link '+(id===state.module?'active':'')+'" href="#'+html(id)+'" data-menu="'+html(id)+'" '+(id===state.module?'aria-current="page"':'')+'><span class="nav-symbol">'+(sym[id]||'•')+'</span><span>'+html(title(id))+'</span><span class="nav-arrow">›</span></a>').join('');
+  return '<details class="nav-group" data-group="'+html(group.id)+'" '+(expanded?'open':'')+'><summary class="nav-group-head"><span>'+html(group.title)+'</span><span class="nav-group-count">'+modules.length+'</span></summary><div class="nav-group-items">'+links+'</div></details>';
  }).join('');
 }
 function renderGuildList(){
