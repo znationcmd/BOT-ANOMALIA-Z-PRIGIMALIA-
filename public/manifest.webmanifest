@@ -1,0 +1,52 @@
+{
+  "id": "/",
+  "name": "ANOMALIA’Z PRIGIMALIA — CMD Dashboard",
+  "short_name": "ANOMALIA’Z",
+  "description": "ANOMALIA’Z PRIGIMALIA — centre de commande et Dashboard du bot Discord",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "theme_color": "#15100a",
+  "background_color": "#080807",
+  "lang": "fr",
+  "dir": "ltr",
+  "categories": [
+    "utilities",
+    "productivity",
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "/media/anomaliaz-icon-192.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/media/anomaliaz-icon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "/media/anomaliaz-icon-512.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/media/anomaliaz-world.webp",
+      "sizes": "1536x864",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "ANOMALIA’Z PRIGIMALIA — centre de commande"
+    }
+  ]
+}
