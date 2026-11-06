@@ -96,44 +96,58 @@ function noticeForLogin(){
  const authError=new URLSearchParams(location.search).get('auth');
  let guidance='';
  if(authError==='credentials'){
-  guidance='<div class="notice auth-help" role="alert"><strong>⚠ Connexion Discord refusée (OAuth2 401).</strong> L’adresse de retour est acceptée, mais Discord rejette les identifiants OAuth2. Dans le portail développeur Discord, ouvre l’application du bot <strong>1520141481820557482</strong>, puis OAuth2 → Client Secret. Mets le secret de cette même application dans Railway → BOT-ANOMALIA-Z-PRIGIMALIA- → Variables → <code>DISCORD_CLIENT_SECRET</code>. Ne partage jamais cette valeur. Après la mise à jour Railway, réessaie la connexion.</div>';
+  guidance='<div class="notice auth-help" role="alert"><div class="issue-title"><span aria-hidden="true">!</span><div><strong>Connexion Discord non terminée</strong><p>Discord a refusé les identifiants OAuth2 (401). Le bot, lui, peut rester actif.</p></div></div><details><summary>Afficher le diagnostic et la correction</summary><p>Vérifie dans le portail développeur l’application <strong>1520141481820557482</strong>. Dans Railway, <code>DISCORD_CLIENT_ID</code> doit identifier cette application et <code>DISCORD_CLIENT_SECRET</code> doit contenir son Client Secret, pas le Bot Token. La variable est présente, mais sa valeur ne peut pas être vérifiée ici.</p><p>Enregistre les modifications avant de retenter la connexion. Ne partage jamais le secret.</p></details></div>';
  }else if(authError==='invalid'){
-  guidance='<div class="notice auth-help" role="alert">⚠ Session Discord interrompue. Ouvre directement le Dashboard dans Safari et relance « Connexion Discord » pour conserver les cookies de connexion.</div>';
+  guidance='<div class="notice auth-help" role="alert"><div class="issue-title"><span aria-hidden="true">!</span><div><strong>Session Discord interrompue</strong><p>Ouvre le Dashboard dans Safari puis relance la connexion, pour conserver les cookies OAuth2.</p></div></div></div>';
  }else if(authError==='failed'){
-  guidance='<div class="notice auth-help" role="alert">⚠ La connexion Discord n’a pas pu être finalisée. Vérifie les variables OAuth2 sur Railway puis réessaie.</div>';
+  guidance='<div class="notice auth-help" role="alert"><div class="issue-title"><span aria-hidden="true">!</span><div><strong>Identification Discord impossible</strong><p>Vérifie les réglages OAuth2, puis réessaie depuis le menu Discord.</p></div></div></div>';
  }
- return guidance+`<div class="notice info">🔒 Le Dashboard est en lecture seule tant qu’un administrateur ne s’est pas connecté avec Discord.
- ${!config.ready?'<strong>Configuration OAuth2 manquante :</strong> '+html((config.missing||[]).join(', '))+'.':''}
- ${config.ready?'<a href="/api/auth/start" class="button small primary">Connexion Discord</a>':'L’activation de la connexion nécessite DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET et l’URL de redirection OAuth2.'}
- <a href="/api/invite" target="_blank" rel="noopener noreferrer" class="button small secondary">⊕ Inviter le bot</a></div>`;
+ const setup=config.ready?'Utilise le bouton « Discord » en haut pour ouvrir ta session administrateur.':'Connexion administrateur non configurée : '+html((config.missing||[]).join(', '))+'.';
+ return guidance+'<div class="access-banner"><div class="access-icon" aria-hidden="true">🔒</div><div><strong>Mode consultation</strong><p>'+setup+'</p></div></div>';
 }
 function overview(){
- const counts=state.overview?.counts||{},players=counts.players||0,whitelist=counts.whitelist||0,
- requests=state.overview?.counts?state.overview.counts.whitelist:0,quests=counts.quests||0;
- const cards=['editor','tools','whitelist','loot','shop','battlepass','rp','bunkers','radio','maps','servers','integrations'];
- return `<section class="hero hero-cinematic" aria-label="Monde ANOMALIA’Z PRIGIMALIA">
+ const counts=state.overview?.counts||{},isAdmin=authed();
+ const memberCount=Array.isArray(state.guildServers)?state.guildServers.length:'—';
+ const groups=[
+  {name:'Monde & survie',desc:'Paramètres et contenu des cartes',icon:'◱',ids:['maps','loot','bunkers','radio']},
+  {name:'Communauté & RP',desc:'Joueurs, accès et progression',icon:'♜',ids:['whitelist','shop','battlepass','rp']},
+  {name:'Administration',desc:'Serveurs et intégrations',icon:'⚙',ids:['servers','players','integrations','settings']}
+ ];
+ const linkItem=id=>'<a class="command-link" href="#'+html(id)+'"><span class="command-icon">'+(sym[id]||'◈')+'</span><span class="command-copy"><strong>'+html(title(id))+'</strong><small>'+html((state.catalog.modules[id]?.description||'').slice(0,92))+'</small></span><span class="command-arrow" aria-hidden="true">›</span></a>';
+ const panels=groups.map(g=>'<section class="command-pane"><div class="command-pane-head"><span class="command-pane-symbol">'+g.icon+'</span><div><h3>'+g.name+'</h3><p>'+g.desc+'</p></div></div><div class="command-links">'+g.ids.filter(id=>state.catalog.modules[id]).map(linkItem).join('')+'</div></section>').join('');
+ const recent=state.overview?.events?.length?state.overview.events.slice(0,4).map(e=>'<div class="activity-row"><span>'+html(e.type)+'</span><time>'+html(dateString(e.at))+'</time></div>').join(''):'<p class="activity-empty">Aucune télémétrie Unreal Engine reçue. Le bridge du jeu n’est pas connecté.</p>';
+ return \`<section class="hero hero-cinematic" aria-label="ANOMALIA’Z PRIGIMALIA">
   <div class="hero-content">
-   <div class="microtag">● LE MONDE D’ANOMALIA’Z · CMD STUDIO</div>
-   <div class="hero-action-box"><h1>CENTRE <span>DE COMMANDE</span></h1>
-   <p>Survivants, RP, cartes, boutique et outils de création.</p>
-   <div class="hero-actions">${link('editor','◈ ANOMALIA Éditor','primary')}${link('tools','⚒ ANOMALIA Tools','outline')}<a class="button invite-bot-btn secondary" href="/api/invite" target="_blank" rel="noopener noreferrer">⊕ Inviter le bot Discord</a></div></div>
+   <div class="microtag">CMD STUDIO <span class="micro-separator">/</span> ANOMALIA’Z PRIGIMALIA</div>
+   <div class="hero-action-box">
+    <span class="hero-overline">DASHBOARD · CENTRE DE CONTRÔLE</span>
+    <h1>Centre de commande</h1>
+    <p>Administration du monde, des joueurs et des serveurs.</p>
+    <div class="hero-actions">\${link('editor','◈ ANOMALIA Éditor','primary')}\${link('tools','⚒ ANOMALIA Tools','outline')}</div>
+   </div>
   </div></section>
-  ${noticeForLogin()}
-  <div class="grid metric-grid">${metric('Bot Discord',state.status?.discordConnected?'ACTIF':'OFFLINE','État réel de la connexion','status')}
-   ${metric('Survivants',players,'Comptes enregistrés','players')}${metric('Whitelist',requests,'Demandes administratives','whitelist')}
-   ${metric('Missions RP',quests,'Quêtes configurées','quests')}</div>
-  <div class="section-head"><h2>◈ CENTRE DE COMMANDE</h2><span>${cards.length} modules essentiels</span></div>
-  <div class="card-grid">${cards.map(id=>`<a class="feature-card" href="#${html(id)}"><span class="feature-icon">${sym[id]||'◈'}</span><h3>${html(title(id))}</h3><p>${html(state.catalog.modules[id]?.description||'')}</p><span class="feature-link">ACCÉDER AU MODULE →</span></a>`).join('')}</div>
-  <div class="section-head"><h2>ÉTAT DES INTÉGRATIONS</h2><span>Contrôle de production</span></div>
-  <div class="two-col"><div class="card"><h3>◉ Réseau et données</h3><div class="details-list">
-   ${infoLine('Bot Discord',state.status?.discordConnected?'Connecté':'Non connecté')}
-   ${infoLine('Base',state.status?.storage==='postgres'?'PostgreSQL persistant':'Fichier local (Railway éphémère)')}
-   ${infoLine('Authentification',state.status?.oauth?'OAuth Discord configuré':'Configuration nécessaire')}
-   ${infoLine('Événements Unreal',state.overview?.gameConnection||'Aucun bridge ANOMALIA connecté')}
-   ${infoLine('Code du jeu','Dépôt GitHub séparé')}
-   </div></div><div class="card"><h3>📡 Derniers événements du jeu</h3>
-    ${state.overview?.events?.length?state.overview.events.slice(0,5).map(e=>`<div class="info-line"><span>${html(e.type)}</span><strong>${html(dateString(e.at))}</strong></div>`).join(''):'<div class="empty"><span class="emoj">◌</span><strong>Aucun signal de jeu reçu</strong><p>La connexion avec le serveur Unreal Engine nécessite un bridge sécurisé.</p></div>'}
-   </div></div>`;
+  \${noticeForLogin()}
+  <section class="overview-kpis" aria-label="Indicateurs du réseau">
+   <div class="section-head compact"><div><span class="section-kicker">RÉSEAU ANOMALIA’Z</span><h2>Vue d’ensemble</h2></div><span class="overview-live \${state.status?.discordConnected?'online':'offline'}">● \${state.status?.discordConnected?'Bot Discord en ligne':'Bot Discord hors ligne'}</span></div>
+   <div class="grid metric-grid">
+    \${metric('Statut du bot',state.status?.discordConnected?'ACTIF':'OFFLINE','Connexion Discord','status')}
+    \${metric('Serveurs',memberCount,isAdmin?'Administrables':'Connexion nécessaire','servers')}
+    \${metric('Survivants',isAdmin?counts.players||0:'—',isAdmin?'Profils enregistrés':'Connexion nécessaire','players')}
+    \${metric('Whitelist',isAdmin?counts.whitelist||0:'—',isAdmin?'Demandes enregistrées':'Connexion nécessaire','whitelist')}
+   </div>
+  </section>
+  <section class="overview-modules" aria-label="Modules de gestion">
+   <div class="section-head compact"><div><span class="section-kicker">ESPACES DE TRAVAIL</span><h2>Gestion des services</h2></div><span>Choisis un domaine à administrer</span></div>
+   <div class="command-grid">\${panels}</div>
+  </section>
+  <section class="overview-bottom">
+   <div class="compact-panel"><div class="compact-panel-head"><h3>État des intégrations</h3><a href="#integrations">Configurer ›</a></div><div class="details-list">
+    \${infoLine('Stockage',state.status?.storage==='postgres'?'PostgreSQL':'Stockage local')}
+    \${infoLine('Authentification',state.status?.oauth?'Configuration détectée':'Non configurée')}
+    \${infoLine('Unreal Engine',state.overview?.gameConnection||'Aucune télémétrie')}
+   </div></div>
+   <div class="compact-panel"><div class="compact-panel-head"><h3>Activité du jeu</h3><span>Derniers événements</span></div><div class="activity-list">\${recent}</div></div>
+  </section>\`;
 }
 function infoLine(k,v){return `<div class="info-line"><span>${html(k)}</span><strong>${html(v)}</strong></div>`}
 function heading(id){
@@ -264,10 +278,7 @@ function render(){
  else if(id==='settings')page=settingsPage();
  else if(id==='integrations')page=integrationsPage();
  else page=modulePage(id);
- const guilds=state.session?.guilds||[];
- const selector=authed()&&guilds.length>1?`<div class="toolbar" style="margin-bottom:18px"><label class="subline" for="guildSelect">Serveur Discord :</label><select class="input" id="guildSelect" style="width:auto;max-width:330px">
-  ${guilds.map(g=>`<option value="${html(g.id)}" ${g.id===state.session.guildId?'selected':''}>${html(g.name)}</option>`).join('')}</select></div>`:'';
- $('#main').innerHTML=selector+page;
+ $('#main').innerHTML=page;
  $('#sidebar').classList.remove('open');
  $('#mobileMenu').setAttribute('aria-expanded','false');
  document.querySelectorAll('.mobile-quicknav a').forEach(a=>{const active=a.getAttribute('href')==='#'+state.module;if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
