@@ -25,7 +25,7 @@ test('dashboard groups modules and reduces large duplicate cards',async()=>{
  assert.match(app,/Communauté & RP/);
  assert.match(app,/Administration/);
  assert.doesNotMatch(app,/class="card-grid">\$\{cards\.map/);
- assert.match(app,/class="metric-grid"/);
+ assert.match(app,/class="grid metric-grid"/);
  assert.match(app,/hero-cinematic/);
 });
 
