@@ -1,0 +1,56 @@
+name: ANOMALIA’Z PRIGIMALIA - Bot Dashboard CI
+on:
+  push:
+    branches:
+      - main
+      - feat/anomaliaz-bot-dashboard-20261106
+  pull_request:
+    paths:
+      - 'server.js'
+      - 'bot.js'
+      - 'lib/**'
+      - 'public/**'
+      - 'tests/**'
+      - 'package.json'
+      - '.github/workflows/check.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Syntax checks
+        run: npm run check
+      - name: Unit and data validation tests
+        run: npm test
+      - name: Public route and access security smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          PORT=8080 DATA_FILE=/tmp/anomaliaz-smoke.json node server.js >/tmp/anomaliaz-server.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 20); do
+            if curl -fsS http://localhost:8080/health >/tmp/anomaliaz-health.json; then break; fi
+            sleep 1
+          done
+          python3 - <<'PY'
+          import json
+          data=json.load(open('/tmp/anomaliaz-health.json'))
+          assert data['ok'] is True, data
+          assert data['discordConnected'] is False, data
+          PY
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/)" = "200"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/catalog)" = "200"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/game-data)" = "200"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/modules/whitelist)" = "401"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/api/bridge/events)" = "401"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/auth/start)" = "503"
+          echo 'Authenticated admin APIs are closed without OAuth configuration.'
