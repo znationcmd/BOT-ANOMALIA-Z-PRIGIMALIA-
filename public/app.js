@@ -64,13 +64,13 @@ function overview(){
  const counts=state.overview?.counts||{},players=counts.players||0,whitelist=counts.whitelist||0,
  requests=state.overview?.counts?state.overview.counts.whitelist:0,quests=counts.quests||0;
  const cards=['editor','tools','whitelist','loot','shop','battlepass','rp','bunkers','radio','maps','servers','integrations'];
- return `<section class="hero">
+ return `<section class="hero hero-cinematic" aria-label="Monde ANOMALIA’Z PRIGIMALIA">
   <div class="hero-content">
-   <div class="microtag">◉ SYSTÈME DE GESTION SURVIE · CMD STUDIO</div>
-   <h1>ANOMALIA<span>’Z</span><br>PRIGIMALIA</h1>
-   <p>Un seul centre de contrôle pour ton univers : survivants, monde ouvert, économie, RP et accès aux outils de création.</p>
-   <div class="hero-actions">${link('editor','◈ Ouvrir ANOMALIA Éditor','primary')}${link('bunkers','⬡ Contrôler les bunkers','outline')}</div>
-  </div><img class="hero-visual" src="/brand.svg" alt="" aria-hidden="true"></section>
+   <div class="microtag">● LE MONDE D’ANOMALIA’Z · CMD STUDIO</div>
+   <div class="hero-action-box"><h1>CENTRE <span>DE COMMANDE</span></h1>
+   <p>Survivants, RP, cartes, boutique et outils de création.</p>
+   <div class="hero-actions">${link('editor','◈ ANOMALIA Éditor','primary')}${link('tools','⚒ ANOMALIA Tools','outline')}</div></div>
+  </div></section>
   ${noticeForLogin()}
   <div class="grid metric-grid">${metric('Bot Discord',state.status?.discordConnected?'ACTIF':'OFFLINE','État réel de la connexion','status')}
    ${metric('Survivants',players,'Comptes enregistrés','players')}${metric('Whitelist',requests,'Demandes administratives','whitelist')}
