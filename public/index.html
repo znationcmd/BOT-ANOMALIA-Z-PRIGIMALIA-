@@ -24,6 +24,13 @@
    <button id="closeMobileMenu" class="sidebar-close" aria-label="Fermer le menu">✕</button><div class="brand-text"><span class="micro">CMD STUDIO · CONTROL NETWORK</span><b>ANOMALIA<span>’Z</span></b><small>PRIGIMALIA</small></div>
   </div>
   <div class="world-state"><span class="live-light" id="connectionLight"></span><span id="connectionLabel">INITIALISATION…</span><span class="vnum">V1.0</span></div>
+  <section class="guild-switcher" aria-label="Serveurs Discord sur lesquels le bot est installé">
+   <div class="guild-head"><span>◈ MES SERVEURS DISCORD</span><span id="guildCount" class="guild-count">—</span></div>
+   <div id="guildList" class="guild-list" aria-live="polite">
+    <a class="guild-empty" href="/api/auth/start">🔒 Connexion Discord pour afficher tes serveurs</a>
+   </div>
+   <a class="guild-add" href="/api/invite" target="_blank" rel="noopener noreferrer">＋ Inviter sur un autre serveur</a>
+  </section>
   <div class="nav-search"><span>⌕</span><input id="navSearch" type="search" placeholder="Rechercher un module..." aria-label="Rechercher un module"></div>
   <nav id="navigation" class="nav-scroll" aria-label="Modules du Dashboard"></nav>
   <div class="sidebar-footer">
