@@ -1,0 +1,82 @@
+{
+  "id": "/",
+  "name": "ANOMALIA’Z PRIGIMALIA — CMD Studio Dashboard",
+  "short_name": "ANOMALIA’Z",
+  "description": "Centre de commande ANOMALIA’Z PRIGIMALIA : jeu, RP, whitelist, boutique, loot, Éditor et Tools.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "fr",
+  "categories": [
+    "games",
+    "productivity",
+    "utilities"
+  ],
+  "theme_color": "#171009",
+  "background_color": "#090908",
+  "icons": [
+    {
+      "src": "/icons/anomalia-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/anomalia-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/anomalia-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/anomalia-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "ANOMALIA Éditor",
+      "short_name": "Éditor",
+      "url": "/?source=pwa#editor",
+      "icons": [
+        {
+          "src": "/icons/anomalia-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Whitelist",
+      "short_name": "Whitelist",
+      "url": "/?source=pwa#whitelist",
+      "icons": [
+        {
+          "src": "/icons/anomalia-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Boutique",
+      "short_name": "Shop",
+      "url": "/?source=pwa#shop",
+      "icons": [
+        {
+          "src": "/icons/anomalia-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
