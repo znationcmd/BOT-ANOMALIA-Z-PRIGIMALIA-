@@ -30,6 +30,10 @@ app.get('/health',controller(async(req,res)=>{
   dataStore:status.mode,authConfigured:authConfig().ready,uptime:Math.round(process.uptime())
  });
 }));
+app.get('/api/app-version',(req,res)=>res.json({
+ version:String(process.env.RAILWAY_GIT_COMMIT_SHA||process.env.RAILWAY_DEPLOYMENT_ID||state.startedAt),
+ service:'anomaliaz-prigimalia-pwa',startedAt:state.startedAt
+}));
 app.get('/api/status',controller(async(req,res)=>{
  const s=await getStatus();
  res.json({online:true,discordConnected:Boolean(state.discord?.isReady?.()),storage:s.mode,oauth:authConfig().ready,
@@ -125,7 +129,19 @@ app.post('/api/bridge/events',controller(async(req,res)=>{
  await addGameEvent(guildId,{type,payload:safe});
  res.json({accepted:true,gameIntegration:'event-ingest-only'});
 }));
-app.use(express.static(path.join(dir,'public'),{index:'index.html',maxAge:0}));
+app.use(express.static(path.join(dir,'public'),{
+ index:'index.html',maxAge:0,setHeaders:(res,filePath)=>{
+  if(filePath.endsWith('/sw.js')){
+   res.setHeader('Service-Worker-Allowed','/');
+   res.setHeader('Cache-Control','no-cache, must-revalidate');
+  }else if(filePath.endsWith('/manifest.webmanifest')||filePath.endsWith('/index.html')
+    ||filePath.endsWith('/app.js')||filePath.endsWith('/style.css')){
+   res.setHeader('Cache-Control','no-cache, must-revalidate');
+  }else if(/\.(?:png|webp|ico)$/.test(filePath)){
+   res.setHeader('Cache-Control','public, max-age=86400');
+  }
+ }
+}));
 app.use((req,res)=>{if(req.path.startsWith('/api/'))return res.status(404).json({error:'API inconnue.'});res.sendFile(path.join(dir,'public','index.html'))});
 app.use((err,req,res,next)=>{
  console.error('Erreur ANOMALIA :',err.message);
