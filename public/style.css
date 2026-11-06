@@ -54,3 +54,114 @@ a{color:inherit;text-decoration:none}a:hover{color:#f6dda4}button:disabled{opaci
 .metric:after{background:linear-gradient(90deg,#ffb52f,#ffe37d,transparent)}
 .feature-card:hover{border-color:#e9aa3b85}
 .input:focus,.field input:focus,.field select:focus,.field textarea:focus{border-color:#ffc250;box-shadow:0 0 0 3px #ffbe4d25}
+
+
+/* Cinematic survival theme — source background is the owner's uploaded 1536×864 artwork.
+   High-DPI vector UI and CSS gradients scale cleanly on 4K/8K monitors. */
+body{background:#090806;color:#fff5db}
+body:before{
+ content:'';position:fixed;inset:-2%;z-index:-3;pointer-events:none;
+ background-image:linear-gradient(90deg,#090806e0,#090806ac 40%,#090806b8),url('/media/anomaliaz-world.webp');
+ background-size:cover;background-position:center center;filter:saturate(.90) brightness(.78);transform:translate3d(0,0,0)
+}
+body:after{
+ content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
+ background:linear-gradient(0deg,#090806c4,transparent 50%,#09080665),radial-gradient(circle at 55% 15%,#ffab1818,transparent 58%)
+}
+.main-wrap{position:relative;background:transparent}
+.sidebar{
+ background:linear-gradient(168deg,#120d08f5,#0c0b0af5 55%,#080908f8);
+ border-right:1px solid #ca8e375a;box-shadow:9px 0 38px #0009;backdrop-filter:blur(20px)
+}
+.nav-scroll{scrollbar-color:#aa6b27 transparent}
+.topbar{background:#110e0bd9;border-bottom:1px solid #ffb63439;backdrop-filter:blur(22px)}
+.brand-mark img{border-radius:50%;object-fit:cover;border:2px solid #ffaa39a8;box-shadow:0 0 18px #ff8b305c}
+.brand-text b span{color:#ffbb40}
+.nav-title{color:#e5aa5e}
+.nav-link.active{background:linear-gradient(90deg,#bd631c55,#4a320d52)}
+.nav-link.active .nav-symbol{color:#ffbe46}
+.feature-card,.metric,.card{background:linear-gradient(150deg,#18130fee,#100e0de9);border-color:#db9a3340;backdrop-filter:blur(16px)}
+.feature-card:hover{border-color:#ffc04e;box-shadow:0 14px 40px #0009,0 0 18px #ffae2f23}
+.feature-card .feature-icon,.module-icon{color:#ffbc4d}
+.feature-card .feature-link{color:#ffd681}
+.metric{background:linear-gradient(160deg,#221608f0,#100e0bfa)}
+.metric-value{text-shadow:0 0 18px #ffa73438}
+.hero-cinematic{
+ min-height:clamp(345px,37vw,520px);border:1px solid #ffb74089;
+ display:flex;align-items:stretch;isolation:isolate;
+ background-image:linear-gradient(0deg,#070706fa 0%,#070706ad 20%,transparent 58%),url('/media/anomaliaz-world.webp');
+ background-position:center;background-size:cover;box-shadow:0 16px 52px #000b,0 0 34px #ffa52922
+}
+.hero-cinematic:before{
+ content:'';inset:0;position:absolute;opacity:.8;
+ background:linear-gradient(90deg,#080807b5 0%,transparent 40%),linear-gradient(0deg,#0008,transparent 40%);
+ pointer-events:none
+}
+.hero-cinematic:after{content:none}
+.hero-cinematic .hero-content{align-self:end;width:100%;max-width:none;padding:26px clamp(20px,3vw,36px);display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:6px 20px}
+.hero-cinematic .microtag{color:#ffd889;background:#120c07ce;padding:9px 11px;border:1px solid #ffbe594d;border-radius:6px;font-size:10px}
+.hero-cinematic .hero-action-box{border-left:3px solid #ffa936;padding-left:17px;background:linear-gradient(90deg,#090705e6,#09070500);max-width:550px}
+.hero-cinematic h1{font-size:clamp(19px,2.1vw,30px);margin:3px 0 6px;letter-spacing:.03em;font-weight:900;text-shadow:0 2px 12px #000}
+.hero-cinematic h1 span{color:#ffce67}
+.hero-cinematic p{margin:0;font-size:12px;color:#ffe7b6}
+.hero-cinematic .hero-actions{margin-top:12px}
+.environment{background:#453110aa;color:#ffe3ad;border-color:#ffbd4d59}
+.pwa-install{white-space:nowrap;border-radius:10px;background:linear-gradient(165deg,#ffce5e,#e99a2b);color:#251406;border:1px solid #ffe89f;box-shadow:inset 0 1px 0 #fff7c1,0 3px 0 #9c4d0e,0 7px 14px #0006}
+.update-notice{font-size:10px;color:#ffdc77}
+.world-state{background:#1a140fe5;border-color:#a46b293e}
+.studio-prompt{background:linear-gradient(145deg,#44260cd9,#1d150c)}
+.badge,.pill{border-color:#e4a94e59}
+/* Tactile raised controls with real press animation, not static decoration. */
+.button,.icon-button,.mobile-menu,.user-badge,.nav-link,.table-actions button,.studio-prompt button,.feature-card{
+ position:relative;isolation:isolate;backface-visibility:hidden;transform:translateY(0);
+ transition:transform .14s ease,box-shadow .15s ease,border-color .15s ease,filter .15s ease,background .15s ease;
+ -webkit-tap-highlight-color:transparent
+}
+.button,.icon-button,.mobile-menu,.table-actions button,.studio-prompt button{
+ box-shadow:inset 0 1px 0 #ffffff66,0 3px 0 #6c421d,0 7px 14px #0008
+}
+.button.primary{background:linear-gradient(168deg,#ffe18b 0%,#ffbd42 42%,#f88a20 100%);color:#251606;text-shadow:0 1px 0 #fff4b363;
+ border:1px solid #ffe594;box-shadow:inset 0 2px 1px #fff6c8,0 4px 0 #9d4a0a,0 11px 25px #000b,0 0 17px #ff9b2969
+}
+.button.outline{background:linear-gradient(160deg,#3b2918ea,#1e1710f0);color:#ffe4ad;border-color:#ffb3498a}
+.button.secondary{background:linear-gradient(160deg,#312313ed,#15120ced);color:#ffe1a3;border:1px solid #e8ab595c}
+.button:hover:not(:disabled),.icon-button:hover:not(:disabled),.table-actions button:hover:not(:disabled),.studio-prompt button:hover:not(:disabled){
+ transform:translateY(-2px);filter:brightness(1.12);
+ box-shadow:inset 0 2px 1px #fff4b5,0 6px 0 #97480d,0 13px 24px #000b,0 0 24px #ffc04778
+}
+.button:active:not(:disabled),.button.is-energized,.icon-button:active,.icon-button.is-energized,
+.table-actions button:active,.table-actions button.is-energized,.studio-prompt button.is-energized{
+ transform:translateY(3px) scale(.98);filter:brightness(1.24);
+ box-shadow:inset 0 2px 9px #ff8c3459,0 1px 0 #9d590d,0 0 18px #ffbf4699,0 0 39px #ff9c2988!important;
+ border-color:#ffefb8
+}
+.button.is-energized:after,.nav-link.is-energized:after,.feature-card.is-energized:after{
+ content:'';position:absolute;inset:-3px;border:2px solid #ffd674;border-radius:inherit;box-shadow:0 0 13px #ffbe56,0 0 26px #ffa529;
+ pointer-events:none;animation:button-light .62s ease-out both
+}
+.nav-link.is-energized,.feature-card.is-energized{box-shadow:0 0 24px #ffaf3e77!important;background:linear-gradient(110deg,#a26a2440,#39230e9a)}
+@keyframes button-light{from{opacity:1;transform:scale(.97)}to{opacity:0;transform:scale(1.055)}}
+@media(max-width:900px){
+ .topbar{padding:0 13px}
+ .pwa-install{padding:8px 10px;font-size:10px}
+ .hero-cinematic{min-height:400px;background-position:center top}
+ .hero-cinematic .hero-content{padding:20px;justify-content:flex-start;gap:10px}
+}
+@media(max-width:640px){
+ body:before{background-position:48% 50%;filter:brightness(.60)}
+ .hero-cinematic{min-height:380px;background-position:51% top}
+ .hero-cinematic .hero-action-box{width:100%;max-width:none}
+ .hero-cinematic .microtag{font-size:8px}
+ .hero-cinematic h1{font-size:22px}
+ .hero-cinematic p{font-size:11px}
+ .hero-cinematic .hero-actions{gap:7px}
+ .environment{display:none}
+ .pwa-install{font-size:9px;padding:8px 7px;max-width:115px}
+ .topbar-right{gap:6px}
+ .topbar-right #clock{display:none}
+ .main-content{padding:16px 12px 32px}
+}
+@media(prefers-reduced-motion:reduce){
+ .button,.icon-button,.mobile-menu,.user-badge,.nav-link,.table-actions button,.studio-prompt button,.feature-card{transition:none}
+ .button.is-energized:after,.nav-link.is-energized:after,.feature-card.is-energized:after{animation:none}
+}

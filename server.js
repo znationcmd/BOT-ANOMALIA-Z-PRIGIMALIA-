@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'node:fs/promises';
 import crypto from 'node:crypto';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -124,6 +125,14 @@ app.post('/api/bridge/events',controller(async(req,res)=>{
  if(JSON.stringify(safe).length>5000)return res.status(400).json({error:'Événement trop volumineux.'});
  await addGameEvent(guildId,{type,payload:safe});
  res.json({accepted:true,gameIntegration:'event-ingest-only'});
+}));
+// Deploy-specific service worker revision: all updates refresh automatically in installed PWAs.
+const buildId=String(process.env.RAILWAY_GIT_COMMIT_SHA||process.env.RAILWAY_DEPLOYMENT_ID||Date.now()).replace(/[^a-zA-Z0-9_-]/g,'').slice(0,72);
+app.get('/sw.js',controller(async(req,res)=>{
+ const script=await fs.readFile(path.join(dir,'public','sw.js'),'utf8');
+ res.set('Cache-Control','no-store, max-age=0, must-revalidate');
+ res.set('Service-Worker-Allowed','/');
+ res.type('text/javascript').send(script.replace('__BUILD_ID__',buildId));
 }));
 app.use(express.static(path.join(dir,'public'),{index:'index.html',maxAge:0}));
 app.use((req,res)=>{if(req.path.startsWith('/api/'))return res.status(404).json({error:'API inconnue.'});res.sendFile(path.join(dir,'public','index.html'))});
