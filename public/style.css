@@ -165,3 +165,23 @@ body:after{
  .button,.icon-button,.mobile-menu,.user-badge,.nav-link,.table-actions button,.studio-prompt button,.feature-card{transition:none}
  .button.is-energized:after,.nav-link.is-energized:after,.feature-card.is-energized:after{animation:none}
 }
+
+/* Exact first user image: cinematic backdrop, adaptive HD/4K/upscaled 8K versions. */
+body:before{content:none!important}
+.cinematic-backdrop{position:fixed;inset:0;z-index:-1;pointer-events:none;
+ background:linear-gradient(90deg,#080705e8 0%,#080705c0 38%,#080705a8 75%,#090704de 100%),url('/media/anomaliaz-world.webp') center center/cover no-repeat;
+ will-change:auto}
+.app-shell{isolation:isolate;position:relative;background:transparent}
+.main-wrap{background:#0b090a75}
+.sidebar{background:linear-gradient(165deg,#170f0bf3 0%,#151009f2 65%,#0d0a09f6 100%)}
+.topbar{background:#100c08eb}
+.hero-cinematic{background-image:linear-gradient(0deg,#070706f0 0%,#0707069c 20%,transparent 60%),url('/media/anomaliaz-world.webp')}
+@media(min-width:2400px){
+ .cinematic-backdrop{background-image:linear-gradient(90deg,#080705db 0%,#080705b3 38%,#080705a3 75%,#090704d8 100%),url('/media/anomaliaz-world-4k.webp')}
+ .hero-cinematic{background-image:linear-gradient(0deg,#070706f0 0%,#0707069c 20%,transparent 60%),url('/media/anomaliaz-world-4k.webp')}
+}
+@media(min-width:5200px){
+ .cinematic-backdrop{background-image:linear-gradient(90deg,#080705db 0%,#080705b3 38%,#080705a3 75%,#090704d8 100%),url('/media/anomaliaz-world-8k.webp')}
+ .hero-cinematic{background-image:linear-gradient(0deg,#070706f0 0%,#0707069c 20%,transparent 60%),url('/media/anomaliaz-world-8k.webp')}
+}
+.button,.icon-button,.nav-link,.table-actions button,.feature-card{touch-action:manipulation}

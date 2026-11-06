@@ -52,12 +52,13 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/manifest.webmanifest)" = "200"
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/sw.js)" = "200"
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/media/anomaliaz-world.webp)" = "200"
-          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/media/anomaliaz-icon-512.webp)" = "200"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/icons/anomalia-512.png)" = "200"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/media/anomaliaz-world-8k.webp)" = "200"
           curl -fsS http://localhost:8080/sw.js | grep -q 'anomaliaz-shell-'
           curl -fsS http://localhost:8080/manifest.webmanifest | python3 -c 'import sys,json; x=json.load(sys.stdin); assert x["display"]=="standalone"; assert len(x["icons"])>=2'
           curl -fsS http://localhost:8080/ > /tmp/anomaliaz-index.html
           grep -q 'rel="manifest"' /tmp/anomaliaz-index.html
-          grep -q '/media/anomaliaz-icon-192.webp' /tmp/anomaliaz-index.html
+          grep -q '/icons/anomalia-192.png' /tmp/anomaliaz-index.html
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/game-data)" = "200"
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/modules/whitelist)" = "401"
           test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://localhost:8080/api/bridge/events)" = "401"

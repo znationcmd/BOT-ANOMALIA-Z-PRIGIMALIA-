@@ -6,8 +6,8 @@
  <meta name="theme-color" content="#110d07">
  <meta name="description" content="ANOMALIA’Z PRIGIMALIA — Dashboard du bot Discord et centre de commande du monde de survie.">
  <title>ANOMALIA’Z PRIGIMALIA · CMD CONTROL</title>
- <link rel="icon" type="image/webp" href="/media/anomaliaz-icon-192.webp">
- <link rel="apple-touch-icon" sizes="180x180" href="/media/anomaliaz-apple-icon.png">
+ <link rel="icon" type="image/png" href="/icons/anomalia-192.png">
+ <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon.png">
  <link rel="manifest" href="/manifest.webmanifest">
  <meta name="apple-mobile-web-app-capable" content="yes">
  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,10 +17,10 @@
 </head>
 <body>
 <div class="ambient haze-a"></div><div class="ambient haze-b"></div>
-<div class="app-shell">
+<div class="app-shell"><div class="cinematic-backdrop" aria-hidden="true"></div>
  <aside class="sidebar" id="sidebar">
   <div class="brand">
-   <a class="brand-mark" href="#overview" aria-label="Accueil ANOMALIA"><img src="/media/anomaliaz-icon-192.webp" alt=""></a>
+   <a class="brand-mark" href="#overview" aria-label="Accueil ANOMALIA"><img src="/icons/anomalia-192.png" alt=""></a>
    <div class="brand-text"><span class="micro">CMD STUDIO · CONTROL NETWORK</span><b>ANOMALIA<span>’Z</span></b><small>PRIGIMALIA</small></div>
   </div>
   <div class="world-state"><span class="live-light" id="connectionLight"></span><span id="connectionLabel">INITIALISATION…</span><span class="vnum">V1.0</span></div>
@@ -46,6 +46,7 @@
 <div id="modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
  <div class="modal-card"><div class="modal-title"><h2 id="modalTitle">Édition</h2><button id="closeModal" class="icon-button" aria-label="Fermer">✕</button></div><form id="recordForm"><div id="formFields" class="form-fields"></div><div class="modal-actions"><button type="button" id="cancelModal" class="button secondary">Annuler</button><button type="submit" class="button primary">Enregistrer la modification</button></div></form></div>
 </div>
-<script type="module" src="/app.js"></script>\n<script defer src="/pwa.js"></script>
+<script type="module" src="/app.js"></script>
+<script defer src="/pwa.js"></script>
 </body>
 </html>

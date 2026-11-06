@@ -1,7 +1,7 @@
 /* ANOMALIA’Z Progressive Web App. Version injected by the Railway deployment. */
 const VERSION='__BUILD_ID__';
 const CACHE='anomaliaz-shell-'+VERSION;
-const SHELL=['/','/offline.html','/index.html','/style.css','/app.js','/pwa.js','/manifest.webmanifest','/media/anomaliaz-world.webp','/media/anomaliaz-icon-192.webp','/media/anomaliaz-icon-512.webp','/media/anomaliaz-apple-icon.png'];
+const SHELL=['/','/offline.html','/index.html','/style.css','/app.js','/pwa.js','/manifest.webmanifest','/media/anomaliaz-world.webp','/icons/anomalia-maskable-192.png','/icons/anomalia-maskable-512.png','/icons/anomalia-192.png','/icons/anomalia-512.png','/icons/apple-icon.png'];
 self.addEventListener('install',event=>{
  event.waitUntil((async()=>{
   const cache=await caches.open(CACHE);
