@@ -56,9 +56,19 @@ function metric(label,value,foot,symbol){return `<article class="metric"><div cl
 function noticeForLogin(){
  if(authed())return '';
  const config=state.session?.config||{};
- return `<div class="notice info">🔒 Le Dashboard est en lecture seule tant qu’un administrateur ne s’est pas connecté avec Discord.
+ const authError=new URLSearchParams(location.search).get('auth');
+ let guidance='';
+ if(authError==='credentials'){
+  guidance='<div class="notice auth-help" role="alert"><strong>⚠ Connexion Discord refusée (OAuth2 401).</strong> L’adresse de retour est acceptée, mais Discord rejette les identifiants OAuth2. Dans le portail développeur Discord, ouvre l’application du bot <strong>1520141481820557482</strong>, puis OAuth2 → Client Secret. Mets le secret de cette même application dans Railway → BOT-ANOMALIA-Z-PRIGIMALIA- → Variables → <code>DISCORD_CLIENT_SECRET</code>. Ne partage jamais cette valeur. Après la mise à jour Railway, réessaie la connexion.</div>';
+ }else if(authError==='invalid'){
+  guidance='<div class="notice auth-help" role="alert">⚠ Session Discord interrompue. Ouvre directement le Dashboard dans Safari et relance « Connexion Discord » pour conserver les cookies de connexion.</div>';
+ }else if(authError==='failed'){
+  guidance='<div class="notice auth-help" role="alert">⚠ La connexion Discord n’a pas pu être finalisée. Vérifie les variables OAuth2 sur Railway puis réessaie.</div>';
+ }
+ return guidance+`<div class="notice info">🔒 Le Dashboard est en lecture seule tant qu’un administrateur ne s’est pas connecté avec Discord.
  ${!config.ready?'<strong>Configuration OAuth2 manquante :</strong> '+html((config.missing||[]).join(', '))+'.':''}
- ${config.ready?'<a href="/api/auth/start" class="button small primary">Connexion Discord</a>':'L’activation de la connexion nécessite une variable Railway DISCORD_CLIENT_SECRET et l’URL de redirection OAuth2.'}</div>`;
+ ${config.ready?'<a href="/api/auth/start" class="button small primary">Connexion Discord</a>':'L’activation de la connexion nécessite DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET et l’URL de redirection OAuth2.'}
+ <a href="/api/invite" target="_blank" rel="noopener noreferrer" class="button small secondary">⊕ Inviter le bot</a></div>`;
 }
 function overview(){
  const counts=state.overview?.counts||{},players=counts.players||0,whitelist=counts.whitelist||0,
@@ -69,7 +79,7 @@ function overview(){
    <div class="microtag">● LE MONDE D’ANOMALIA’Z · CMD STUDIO</div>
    <div class="hero-action-box"><h1>CENTRE <span>DE COMMANDE</span></h1>
    <p>Survivants, RP, cartes, boutique et outils de création.</p>
-   <div class="hero-actions">${link('editor','◈ ANOMALIA Éditor','primary')}${link('tools','⚒ ANOMALIA Tools','outline')}</div></div>
+   <div class="hero-actions">${link('editor','◈ ANOMALIA Éditor','primary')}${link('tools','⚒ ANOMALIA Tools','outline')}<a class="button invite-bot-btn secondary" href="/api/invite" target="_blank" rel="noopener noreferrer">⊕ Inviter le bot Discord</a></div></div>
   </div></section>
   ${noticeForLogin()}
   <div class="grid metric-grid">${metric('Bot Discord',state.status?.discordConnected?'ACTIF':'OFFLINE','État réel de la connexion','status')}
