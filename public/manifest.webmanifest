@@ -39,14 +39,5 @@
       "type": "image/webp",
       "purpose": "maskable"
     }
-  ],
-  "screenshots": [
-    {
-      "src": "/media/anomaliaz-world.webp",
-      "sizes": "1536x864",
-      "type": "image/webp",
-      "form_factor": "wide",
-      "label": "ANOMALIA’Z PRIGIMALIA — centre de commande"
-    }
   ]
 }
