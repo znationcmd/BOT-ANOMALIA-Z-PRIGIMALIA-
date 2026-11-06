@@ -185,3 +185,97 @@ body:before{content:none!important}
  .hero-cinematic{background-image:linear-gradient(0deg,#070706f0 0%,#0707069c 20%,transparent 60%),url('/media/anomaliaz-world-8k.webp')}
 }
 .button,.icon-button,.nav-link,.table-actions button,.feature-card{touch-action:manipulation}
+
+
+/* ANOMALIA’Z — responsive mobile/PWA layout 2026-11-06 */
+html,body{width:100%;max-width:100%;overflow-x:clip}
+.app-shell,.main-wrap,.main-content,.topbar,.topbar-left,.topbar-right,
+.hero,.hero-content,.hero-action-box,.grid,.metric-grid,.card-grid,.two-col,
+.card,.metric,.feature-card{min-width:0}
+.notice,.metric,.metric-value,.card,.feature-card,.module-head,
+.info-line,.section-head,.hero-cinematic .microtag{overflow-wrap:anywhere}
+[hidden]{display:none!important}
+@media(max-width:900px){
+ .app-shell{width:100%;grid-template-columns:minmax(0,1fr)}
+ .main-wrap,.main-content{width:100%;max-width:100%}
+ .main-content{padding:18px max(12px,env(safe-area-inset-right)) 38px max(12px,env(safe-area-inset-left))}
+ .topbar{width:100%;min-width:0;padding-inline:12px;gap:8px}
+ .topbar-left,.topbar-right{min-width:0;gap:8px}
+ .crumb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .crumb span{margin-inline:5px}
+ .sidebar{width:min(320px,calc(100dvw - 42px));max-width:100%}
+ .two-col{grid-template-columns:minmax(0,1fr)}
+ .toolbar,.section-head{min-width:0}
+ .toolbar .spacer{flex-basis:0}
+ .toolbar input[type=search]{width:min(100%,250px)}
+}
+@media(max-width:640px){
+ .topbar{height:58px;padding-inline:10px}
+ .topbar-left{flex:1 1 auto}
+ .topbar-right{flex:0 0 auto;gap:5px}
+ .topbar .crumb{display:none}
+ .mobile-menu,.topbar .icon-button{width:38px;min-width:38px;height:38px;padding:5px;display:grid;place-items:center}
+ .user-badge{width:40px;min-width:40px;max-width:40px;height:40px;padding:5px;justify-content:center;flex-shrink:0}
+ .user-badge #userLabel{display:none}
+ .user-badge .avatar-circle{width:28px;height:28px;flex-shrink:0}
+ .pwa-install{max-width:none;min-height:36px;padding:6px 10px;font-size:0;white-space:nowrap}
+ .pwa-install::before{content:"↓ APP";font-size:10px;font-weight:900;letter-spacing:.04em}
+ .main-content{padding:13px max(10px,env(safe-area-inset-right)) 32px max(10px,env(safe-area-inset-left))}
+ .hero-cinematic{
+  display:block;min-height:0;width:100%;
+  background-color:#0a0907;
+  background-image:linear-gradient(180deg,#0807050a 0%,#08070512 35%,#090706c7 58%,#090706fb 79%),url('/media/anomaliaz-world.webp');
+  background-position:center top,center top;
+  background-repeat:no-repeat,no-repeat;
+  background-size:100% 100%,100% auto;
+  border-radius:16px;
+  margin-bottom:14px;
+ }
+ .hero-cinematic:before{background:linear-gradient(180deg,transparent 0%,#090807a0 68%,#090807 100%);opacity:.3}
+ .hero-cinematic .hero-content{
+  display:block;width:100%;max-width:none;
+  padding:clamp(154px,39vw,194px) 14px 16px;
+ }
+ .hero-cinematic .microtag{display:inline-block;max-width:100%;font-size:8px;letter-spacing:.09em;line-height:1.4;padding:7px 9px;margin-bottom:10px}
+ .hero-cinematic .hero-action-box{width:100%;max-width:none;min-width:0;padding-left:11px;border-left-width:3px}
+ .hero-cinematic h1{font-size:clamp(19px,5.5vw,24px);line-height:1.1;letter-spacing:-.025em;margin:0 0 5px}
+ .hero-cinematic p{font-size:11px;line-height:1.45;margin:0}
+ .hero-cinematic .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:11px}
+ .hero-cinematic .hero-actions .button{width:100%;min-width:0;min-height:42px;padding:9px 6px;font-size:10px;line-height:1.2;white-space:normal;text-align:center}
+ .notice{margin:12px 0;padding:12px;font-size:11px;line-height:1.5}
+ .metric-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0 0 22px}
+ .metric{padding:12px;min-height:112px;border-radius:12px}
+ .metric:after{left:12px}
+ .metric-top{font-size:9px;line-height:1.4;letter-spacing:.02em;gap:4px;align-items:flex-start}
+ .metric-symbol{font-size:16px;line-height:1}
+ .metric-value{font-size:clamp(22px,6vw,29px);line-height:1.08;margin-top:13px;letter-spacing:-.04em}
+ .metric-foot{font-size:10px;line-height:1.35;margin-top:6px}
+ .card-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+ .feature-card{min-height:0;padding:15px;gap:6px}
+ .feature-card .feature-icon{font-size:22px}
+ .feature-card h3{font-size:14px}
+ .section-head{flex-wrap:wrap;align-items:flex-start;gap:5px;margin:23px 0 11px}
+ .section-head h2{font-size:15px}
+ .section-head span{font-size:10px}
+ .card{padding:15px}
+ .info-line{align-items:flex-start;gap:8px}
+ .info-line strong{min-width:0;max-width:60%;text-align:right;overflow-wrap:anywhere}
+ .module-head{gap:10px}
+ .module-head .tag{max-width:100%;overflow-wrap:anywhere}
+ .display-title{font-size:clamp(24px,7vw,29px)}
+ .footbar{height:auto;min-height:44px;padding:8px 12px;font-size:8px}
+ .table-wrap{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+ .modal-card{padding:17px;max-height:calc(100dvh - 32px)}
+ .modal-actions{flex-wrap:wrap}
+ .modal-actions .button{flex:1 1 125px}
+ .toast{max-width:calc(100vw - 24px);left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom))}
+}
+@media(max-width:350px){
+ .topbar{padding-inline:7px}
+ .topbar-left,.topbar-right{gap:4px}
+ .pwa-install{padding-inline:7px}
+ .hero-cinematic .hero-content{padding-top:143px}
+ .hero-cinematic .hero-actions{grid-template-columns:minmax(0,1fr)}
+ .metric-grid{grid-template-columns:minmax(0,1fr)}
+ .metric{min-height:96px}
+}
