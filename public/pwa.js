@@ -32,7 +32,10 @@ window.addEventListener('appinstalled',()=>{
  if(installButton){installButton.textContent='✓ INSTALLÉE';installButton.disabled=true;}
 });
 if(installButton){
- installButton.hidden=standalone();
+ // Keep a visible APP control in the mobile header even in standalone PWA mode.
+ installButton.hidden=false;
+ if(standalone()) installButton.textContent='✓ APP';
+ else if(window.matchMedia('(max-width:640px)').matches) installButton.textContent='↓ APP';
  installButton.addEventListener('click',async()=>{
   if(installPrompt){
    const prompt=installPrompt;installPrompt=null;await prompt.prompt();await prompt.userChoice;return;
