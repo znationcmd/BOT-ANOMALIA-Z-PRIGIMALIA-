@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {initStore,readGuildData,listRecords,createRecord,updateRecord,deleteRecord,getStatus,addGameEvent,mutateGuild} from './lib/store.js';
 import {MODULES,GROUPS,FIELDS,validateEntry,GAME_REPO} from './lib/modules.js';
 import {BUNKERS,ANTENNAS,decodeMorse,encodeMorse} from './lib/game-data.js';
-import {authConfig,oauthStart,oauthCallback,authRequired,csrfRequired,selectGuild,logout,sessionInfo} from './lib/auth.js';
+import {authConfig,oauthStart,oauthCallback,authRequired,csrfRequired,selectGuild,logout,sessionInfo,session} from './lib/auth.js';
 import {startDiscord} from './bot.js';
 
 const dir=path.dirname(fileURLToPath(import.meta.url));
@@ -50,6 +50,23 @@ app.get('/api/status',controller(async(req,res)=>{
  res.json({online:true,discordConnected:Boolean(state.discord?.isReady?.()),storage:s.mode,oauth:authConfig().ready,
   gameBridgeConfigured:Boolean(process.env.GAME_BRIDGE_SECRET),time:new Date().toISOString()});
 }));
+// Only reveal installed Discord guild names to members who administer those guilds.
+app.get('/api/discord/servers',(req,res)=>{
+ const userSession=session(req);
+ if(!userSession)return res.status(401).json({error:'Connexion Discord requise.'});
+ const client=state.discord;
+ const connected=Boolean(client?.isReady?.());
+ const guilds=(userSession.guilds||[])
+  .filter(g=>client?.guilds?.cache?.has(g.id))
+  .map(g=>{
+   const botGuild=client.guilds.cache.get(g.id);
+   const name=String(g.name||botGuild?.name||'Serveur Discord').slice(0,90);
+   const icon=/^(?:a_)?[0-9a-f]{32}$/i.test(String(g.icon||''))?String(g.icon):null;
+   return {id:g.id,name,iconUrl:icon?'https://cdn.discordapp.com/icons/'+g.id+'/'+icon+'.webp?size=64':null,
+    members:Number.isFinite(botGuild?.memberCount)?botGuild.memberCount:null};
+  }).sort((a,b)=>a.name.localeCompare(b.name,'fr'));
+ res.json({connected,guilds,selectedGuildId:userSession.guildId||null});
+});
 app.get('/api/catalog',(req,res)=>res.json({groups:GROUPS,modules:MODULES,fields:FIELDS,gameRepo:GAME_REPO}));
 app.get('/api/game-data',(req,res)=>res.json({bunkers:BUNKERS,antennas:ANTENNAS,source:'game-prototype-reference',live:false,frequencyMHz:80}));
 app.post('/api/morse/decode',controller(async(req,res)=>{
