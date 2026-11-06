@@ -1,6 +1,6 @@
 const state={
  catalog:null,session:null,status:null,game:null,overview:null,records:[],module:'overview',
- search:'',filter:'',loading:false
+ search:'',filter:'',loading:false,guildServers:null,guildError:null
 };
 const $=s=>document.querySelector(s);
 const html=(value='')=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -38,6 +38,43 @@ function renderNavigation(){
   if(!modules.length)return '';
   return `<div class="nav-title">${html(group.title)}</div>`+modules.map(id=>`<a class="nav-link ${id===state.module?'active':''}" href="#${html(id)}" data-menu="${html(id)}"><span class="nav-symbol">${sym[id]||'•'}</span><span>${html(title(id))}</span><span class="nav-arrow">›</span></a>`).join('');
  }).join('');
+}
+function renderGuildList(){
+ const container=$('#guildList'),counter=$('#guildCount');
+ if(!container||!counter)return;
+ if(!state.session?.authenticated){
+  counter.textContent='🔒';
+  container.innerHTML='<a class="guild-empty" href="/api/auth/start">🔒 Connecte-toi pour voir les serveurs où le bot est installé</a>';
+  return;
+ }
+ const guilds=state.guildServers;
+ if(!Array.isArray(guilds)){
+  counter.textContent='…';
+  container.innerHTML='<span class="guild-empty">'+html(state.guildError||'Chargement des serveurs…')+'</span>';
+  return;
+ }
+ counter.textContent=String(guilds.length);
+ if(!guilds.length){
+  container.innerHTML='<span class="guild-empty">Aucun serveur commun administrable trouvé. Invite le bot sur un serveur que tu gères.</span>';
+  return;
+ }
+ container.innerHTML=guilds.map(g=>{
+  const selected=g.id===state.session?.guildId;
+  const initials=String(g.name||'D').slice(0,2).toUpperCase();
+  const avatar=g.iconUrl?'<img src="'+html(g.iconUrl)+'" alt="" loading="lazy" referrerpolicy="no-referrer">':html(initials);
+  const members=g.members===null?'':('<small>'+html(g.members)+' membres</small>');
+  return '<button type="button" class="guild-chip '+(selected?'selected':'')+'" data-switch-guild="'+html(g.id)+'" aria-pressed="'+selected+'" title="'+html(g.name)+'">'+
+   '<span class="guild-avatar">'+avatar+'</span><span class="guild-name"><strong>'+html(g.name)+'</strong>'+members+'</span>'+
+   '<span class="guild-check" aria-hidden="true">'+(selected?'●':'›')+'</span></button>';
+ }).join('');
+}
+async function loadGuildServers(){
+ if(!state.session?.authenticated){state.guildServers=null;state.guildError=null;return;}
+ try{
+  const result=await api('/api/discord/servers');
+  state.guildServers=Array.isArray(result.guilds)?result.guilds:[];
+  state.guildError=null;
+ }catch(error){state.guildServers=null;state.guildError=error.message;}
 }
 function renderUser(){
  const u=$('#userLabel');
@@ -217,7 +254,7 @@ function render(){
  if(!state.catalog)return;
  const id=state.catalog.modules[state.module]?state.module:'overview';state.module=id;
  $('#crumb').textContent=title(id).toUpperCase();
- renderNavigation();renderUser();
+ renderNavigation();renderUser();renderGuildList();
  let page;
  if(id==='overview')page=overview();
  else if(id==='editor')page=editorPage();
@@ -297,7 +334,7 @@ function bind(){
  $('#navSearch').addEventListener('input',renderNavigation);
  $('#mobileMenu').addEventListener('click',()=>{const open=$('#sidebar').classList.toggle('open');$('#mobileMenu').setAttribute('aria-expanded',String(open));});
  $('#closeMobileMenu').addEventListener('click',()=>{$('#sidebar').classList.remove('open');$('#mobileMenu').setAttribute('aria-expanded','false');});
- $('#refreshBtn').addEventListener('click',async()=>{try{state.status=await api('/api/status');await navigate();toast('Données actualisées.')}catch(e){toast(e.message)}});
+ $('#refreshBtn').addEventListener('click',async()=>{try{state.status=await api('/api/status');await loadGuildServers();await navigate();toast('Données actualisées.')}catch(e){toast(e.message)}});
  $('#closeModal').addEventListener('click',closeModal);$('#cancelModal').addEventListener('click',closeModal);
  $('#modal').addEventListener('click',event=>{if(event.target.id==='modal')closeModal()});
  $('#recordForm').addEventListener('submit',submitModal);
@@ -317,6 +354,12 @@ function bind(){
  });
  document.addEventListener('click',async e=>{
   const el=e.target.closest('button,[data-jump]');if(!el)return;
+  if(el.dataset.switchGuild){
+   if(el.dataset.switchGuild===state.session?.guildId)return;
+   try{const result=await api('/api/select-guild',{method:'POST',body:{guildId:el.dataset.switchGuild}});state.session.guildId=result.guildId;await navigate();toast('Serveur Discord sélectionné.');}
+   catch(err){toast('Changement de serveur : '+err.message)}
+   return;
+  }
   if(el.dataset.jump){location.hash='#'+el.dataset.jump;return}
   if(el.dataset.create){openModal(el.dataset.create,null);return}
   if(el.dataset.edit){openModal(state.module,state.records.find(r=>r.id===el.dataset.edit));return}
@@ -342,7 +385,7 @@ async function bootstrap(){
   const [catalog,status,session,game]=await Promise.all([
    api('/api/catalog'),api('/api/status'),api('/api/session'),api('/api/game-data')
   ]);
-  Object.assign(state,{catalog,status,session,game});bind();await navigate();
+  Object.assign(state,{catalog,status,session,game});bind();await loadGuildServers();await navigate();
   const auth=URLSearchParams?new URLSearchParams(location.search).get('auth'):null;
   if(auth)toast('Connexion Discord : '+auth);
  }catch(e){$('#main').innerHTML='<div class="login-card"><img class="login-logo" src="/media/anomaliaz-icon-192.webp" alt=""><h1>ANOMALIA’Z PRIGIMALIA</h1><p>Dashboard temporairement indisponible : '+html(e.message)+'</p><button class="button primary" onclick="location.reload()">Réessayer</button></div>'}
