@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#0b0912">
+ <meta name="description" content="ANOMALIA’Z PRIGIMALIA — Dashboard du bot Discord et centre de commande du monde de survie.">
+ <title>ANOMALIA’Z PRIGIMALIA · CMD CONTROL</title>
+ <link rel="icon" type="image/svg+xml" href="/brand.svg">
+ <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="ambient haze-a"></div><div class="ambient haze-b"></div>
+<div class="app-shell">
+ <aside class="sidebar" id="sidebar">
+  <div class="brand">
+   <a class="brand-mark" href="#overview" aria-label="Accueil ANOMALIA"><img src="/brand.svg" alt=""></a>
+   <div class="brand-text"><span class="micro">CMD STUDIO · CONTROL NETWORK</span><b>ANOMALIA<span>’Z</span></b><small>PRIGIMALIA</small></div>
+  </div>
+  <div class="world-state"><span class="live-light" id="connectionLight"></span><span id="connectionLabel">INITIALISATION…</span><span class="vnum">V1.0</span></div>
+  <div class="nav-search"><span>⌕</span><input id="navSearch" type="search" placeholder="Rechercher un module..." aria-label="Rechercher un module"></div>
+  <nav id="navigation" class="nav-scroll" aria-label="Modules du Dashboard"></nav>
+  <div class="sidebar-footer">
+   <div class="studio-prompt"><span>◈</span><div><strong>ANOMALIA ÉDITOR</strong><small>Conception du monde et assets</small></div><button data-jump="editor" aria-label="Ouvrir l'éditeur">↗</button></div>
+   <div class="smallprint">© 2026 CMD STUDIO · PRIGIMALIA</div>
+  </div>
+ </aside>
+ <div class="main-wrap">
+  <header class="topbar">
+   <div class="topbar-left"><button class="mobile-menu" id="mobileMenu" aria-label="Ouvrir le menu">☰</button><div class="crumb">CMD STUDIO <span>/</span> <strong id="crumb">OVERVIEW</strong></div></div>
+   <div class="topbar-right"><span class="environment">● PRODUCTION</span><span id="clock">--:--</span><button class="icon-button" id="refreshBtn" title="Rafraîchir" aria-label="Rafraîchir">↻</button><button class="user-badge" id="userBadge" title="Session Discord"><span class="avatar-circle">✦</span><span id="userLabel">Connexion Discord</span></button></div>
+  </header>
+  <main id="main" class="main-content" tabindex="-1">
+   <section class="loading-state"><div class="scanner"></div><h1>ANOMALIA’Z PRIGIMALIA</h1><p>Connexion au centre de commande...</p></section>
+  </main>
+  <footer class="footbar"><span>◉ SURVIVAL SYSTEMS · RADIO · WORLDS · RP · ASSETS</span><span id="footerState">SYSTÈME SÉCURISÉ</span></footer>
+ </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="modal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+ <div class="modal-card"><div class="modal-title"><h2 id="modalTitle">Édition</h2><button id="closeModal" class="icon-button" aria-label="Fermer">✕</button></div><form id="recordForm"><div id="formFields" class="form-fields"></div><div class="modal-actions"><button type="button" id="cancelModal" class="button secondary">Annuler</button><button type="submit" class="button primary">Enregistrer la modification</button></div></form></div>
+</div>
+<script type="module" src="/app.js"></script>
+</body>
+</html>
