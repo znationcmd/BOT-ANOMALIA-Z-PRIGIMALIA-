@@ -146,3 +146,9 @@ app.listen(port,'0.0.0.0',()=>console.log("Dashboard ANOMALIA’Z actif sur 0.0.
 const bot=await startDiscord();
 // Keep the client reference even if the Discord ready event fires after login resolves.
 state.discord=typeof bot?.isReady==='function'?bot:null;
+const oauthClientId=String(process.env.DISCORD_CLIENT_ID||'');
+const botApplicationId=String(bot?.application?.id||bot?.user?.id||'');
+const oauthRedirect=String(process.env.PUBLIC_BASE_URL||'').replace(/\/$/,'')+'/api/auth/callback';
+console.log('ANOMALIA OAuth2: client_id='+oauthClientId+' redirect_uri='+oauthRedirect);
+if(botApplicationId&&oauthClientId&&botApplicationId!==oauthClientId)
+ console.error('ANOMALIA OAuth2: DISCORD_CLIENT_ID ne correspond pas à l’application du bot Discord.');
