@@ -16,16 +16,16 @@ test('public Discord invite uses real bot application ID with scoped permissions
  assert.doesNotMatch(server,/url\.searchParams\.set\('permissions','8'\)/);
 });
 
-test('public invitation appears in desktop header, sidebar, and mobile shortcuts',async()=>{
+test('exactly one public invite action is visible in the dashboard top navigation',async()=>{
  const [index,app,css]=await Promise.all([
-  source('public/index.html'),source('public/app.js'),source('public/style.css')
+  source('public/index.html'),source('public/app.js'),source('public/design-v2.css')
  ]);
  assert.match(index,/bot-invite-top/);
- assert.match(index,/bot-invite-side/);
- assert.match(index,/quicknav-invite/);
- assert.match(app,/invite-bot-btn/);
- assert.match(app,/href="\/api\/invite"/);
- assert.match(css,/hero-cinematic \.hero-actions \.invite-bot-btn/);
+ assert.equal((index.match(/href="\/api\/invite"/g)||[]).length,1,'avoid duplicate invite links in layout');
+ assert.doesNotMatch(app,/invite-bot-btn/,'hero and login notice should not repeat invite action');
+ assert.match(css,/\.bot-invite-top/);
+ assert.match(index,/id="installApp"/);
+ assert.equal((index.match(/id="installApp"/g)||[]).length,1);
 });
 
 test('OAuth2 failure is explained persistently without leaking credentials',async()=>{
