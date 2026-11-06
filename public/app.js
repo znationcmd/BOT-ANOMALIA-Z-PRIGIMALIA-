@@ -70,7 +70,7 @@ function overview(){
    <h1>ANOMALIA<span>’Z</span><br>PRIGIMALIA</h1>
    <p>Un seul centre de contrôle pour ton univers : survivants, monde ouvert, économie, RP et accès aux outils de création.</p>
    <div class="hero-actions">${link('editor','◈ Ouvrir ANOMALIA Éditor','primary')}${link('bunkers','⬡ Contrôler les bunkers','outline')}</div>
-  </div><img class="hero-visual" src="/brand.svg" alt="" aria-hidden="true"></section>
+  </div><img class="hero-visual" src="/icons/anomalia-512.png" alt="" aria-hidden="true"></section>
   ${noticeForLogin()}
   <div class="grid metric-grid">${metric('Bot Discord',state.status?.discordConnected?'ACTIF':'OFFLINE','État réel de la connexion','status')}
    ${metric('Survivants',players,'Comptes enregistrés','players')}${metric('Whitelist',requests,'Demandes administratives','whitelist')}
@@ -332,6 +332,115 @@ async function bootstrap(){
   Object.assign(state,{catalog,status,session,game});bind();await navigate();
   const auth=URLSearchParams?new URLSearchParams(location.search).get('auth'):null;
   if(auth)toast('Connexion Discord : '+auth);
- }catch(e){$('#main').innerHTML='<div class="login-card"><img class="login-logo" src="/brand.svg" alt=""><h1>ANOMALIA’Z PRIGIMALIA</h1><p>Dashboard temporairement indisponible : '+html(e.message)+'</p><button class="button primary" onclick="location.reload()">Réessayer</button></div>'}
+ }catch(e){$('#main').innerHTML='<div class="login-card"><img class="login-logo" src="/icons/anomalia-512.png" alt=""><h1>ANOMALIA’Z PRIGIMALIA</h1><p>Dashboard temporairement indisponible : '+html(e.message)+'</p><button class="button primary" onclick="location.reload()">Réessayer</button></div>'}
 }
 bootstrap();
+
+/* Installation PWA Windows/macOS/Android/iOS + activation automatique des nouvelles versions. */
+function setupPwa(){
+ const installButton=document.getElementById('installBtn');
+ const updateButton=document.getElementById('updateBtn');
+ const statusNode=document.getElementById('pwaStatus');
+ const standalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+ let deferredPrompt=null,registration=null,baseVersion=null;
+ let reloading=false,uiBusy=false;
+ const notify=(message)=>{
+  statusNode.textContent=message;statusNode.hidden=false;
+  clearTimeout(notify.timeout);notify.timeout=setTimeout(()=>statusNode.hidden=true,5500);
+ };
+ const showInstall=()=>{installButton.hidden=standalone();};
+ showInstall();
+ window.addEventListener('beforeinstallprompt',event=>{
+  event.preventDefault();deferredPrompt=event;showInstall();
+ });
+ window.addEventListener('appinstalled',()=>{
+  deferredPrompt=null;installButton.hidden=true;notify('Application ANOMALIA’Z installée ! Les mises à jour arrivent automatiquement.');
+ });
+ installButton.addEventListener('click',async()=>{
+  if(standalone())return notify('ANOMALIA’Z est déjà installée.');
+  if(deferredPrompt){
+   const prompt=deferredPrompt;deferredPrompt=null;
+   await prompt.prompt();
+   const choice=await prompt.userChoice;
+   if(choice.outcome==='accepted')notify('Installation ANOMALIA’Z lancée.');
+   else notify('Installation annulée. Tu peux installer plus tard.');
+   return;
+  }
+  if(/iPad|iPhone|iPod/.test(navigator.userAgent)){
+   notify('Sur iPhone : bouton Partager dans Safari, puis « Sur l’écran d’accueil ».');
+  }else{
+   notify('Dans Chrome ou Edge : menu ⋮, puis « Installer l’application ANOMALIA’Z ».');
+  }
+ });
+ const editing=()=>!document.getElementById('modal').hidden
+  ||Boolean(document.activeElement?.matches('textarea,input:not([type="search"]),select'));
+ const readyToReload=()=>{
+  if(reloading)return;
+  if(editing()){
+   updateButton.hidden=false;notify('Nouvelle version prête. Enregistre tes modifications puis touche « Mise à jour ».');
+  }else{
+   reloading=true;window.location.reload();
+  }
+ };
+ updateButton.addEventListener('click',()=>{
+  if(registration?.waiting)registration.waiting.postMessage({type:'SKIP_WAITING'});
+  else readyToReload();
+ });
+ const fetchVersion=async()=>{
+  if(!navigator.onLine)return;
+  try{
+   const response=await fetch('/api/app-version',{cache:'no-store',credentials:'same-origin'});
+   if(!response.ok)return;
+   const body=await response.json();
+   const version=String(body.version||'');
+   if(!version)return;
+   if(baseVersion===null){baseVersion=version;return}
+   if(version!==baseVersion){updateButton.hidden=false;readyToReload()}
+  }catch{/* Keep current install offline. */}
+ };
+ const checkForUpdate=()=>{
+  if(document.hidden)return;
+  registration?.update().catch(()=>{});
+  fetchVersion();
+ };
+ if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+   if(!navigator.serviceWorker.controller)return;
+   readyToReload();
+  });
+  navigator.serviceWorker.register('/sw.js',{scope:'/',updateViaCache:'none'}).then(reg=>{
+   registration=reg;
+   if(reg.waiting){updateButton.hidden=false;notify('Nouvelle version ANOMALIA’Z disponible.')}
+   reg.addEventListener('updatefound',()=>{
+    const worker=reg.installing;
+    worker?.addEventListener('statechange',()=>{
+     if(worker.state==='installed'&&navigator.serviceWorker.controller){
+      updateButton.hidden=false;
+      if(!editing())worker.postMessage({type:'SKIP_WAITING'});
+     }
+    });
+   });
+   reg.update().catch(()=>{});
+  }).catch(error=>console.warn('Installation PWA :',error.message));
+ }
+ fetchVersion();
+ setInterval(checkForUpdate,5*60*1000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkForUpdate()});
+ window.addEventListener('online',checkForUpdate);
+ window.addEventListener('offline',()=>notify('Mode hors ligne : navigation possible, données du bot indisponibles.'));
+ document.addEventListener('pointerdown',event=>{
+  const element=event.target.closest('.button,.icon-button,.studio-prompt button,.table-actions button');
+  if(!element||element.disabled)return;
+  element.classList.add('is-pressed','is-lit');
+  clearTimeout(element._pressTimeout);
+  element._pressTimeout=setTimeout(()=>element.classList.remove('is-pressed','is-lit'),820);
+ },{passive:true});
+ document.addEventListener('keydown',event=>{
+  if(!['Enter',' '].includes(event.key))return;
+  const element=event.target.closest('.button,.icon-button,.studio-prompt button,.table-actions button');
+  if(!element)return;
+  element.classList.add('is-lit');
+  setTimeout(()=>element.classList.remove('is-lit'),820);
+ });
+}
+setupPwa();
