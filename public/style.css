@@ -348,3 +348,19 @@ html,body{width:100%;max-width:100%;overflow-x:clip}
  .sidebar-close{display:grid;place-items:center;position:absolute;right:12px;top:30px;width:34px;height:34px;background:#3a2514;border:1px solid #d79e50;border-radius:9px}
  .sidebar .brand{position:relative;padding-right:46px}
 }
+
+
+/* Public bot invitations, readable on phone/PWA without a Discord admin session. */
+.bot-invite-side{display:flex;width:100%;margin-bottom:15px;min-height:44px;font-size:12px}
+.bot-invite-top{white-space:nowrap;background:linear-gradient(155deg,#ffdb79,#f29a25);color:#241407}
+.quicknav-invite{background:linear-gradient(155deg,#ffdb79,#f29a25)!important;color:#241407!important;border-color:#ffe1a0!important}
+.hero-cinematic .hero-actions .invite-bot-btn{min-width:150px;background:linear-gradient(160deg,#292015,#14100a);color:#ffe2a3;border:1px solid #ffcb6a}
+.auth-help{border:1px solid #ffb956;color:#fff0cd;background:#39230dd9;line-height:1.6;padding:15px 17px;border-radius:12px}
+.auth-help code{font:700 .95em ui-monospace,monospace;overflow-wrap:anywhere;color:#ffdf9a}
+@media(max-width:900px){.bot-invite-top{display:none}}
+@media(max-width:640px){
+ .hero-cinematic .hero-actions .invite-bot-btn{grid-column:1/-1;min-height:44px}
+ .bot-invite-side{min-height:44px}
+ .auth-help{font-size:12px;padding:12px}
+ .quicknav-invite{font-weight:900}
+}
