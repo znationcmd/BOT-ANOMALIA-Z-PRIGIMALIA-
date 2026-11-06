@@ -21,6 +21,20 @@ app.use((req,res,next)=>{
 });
 const port=Number(process.env.PORT||8080);
 const state={startedAt:new Date().toISOString(),discord:null,discordReady:false};
+function botInviteUrl(){
+ const applicationId=String(state.discord?.application?.id||state.discord?.user?.id||process.env.DISCORD_CLIENT_ID||'').trim();
+ if(!/^\d{15,22}$/.test(applicationId))return null;
+ const url=new URL('https://discord.com/oauth2/authorize');
+ url.searchParams.set('client_id',applicationId);
+ url.searchParams.set('scope','bot applications.commands');
+ url.searchParams.set('permissions','3072'); // View Channels and Send Messages; no Administrator permission.
+ return url.toString();
+}
+app.get('/api/invite',(req,res)=>{
+ const invite=botInviteUrl();
+ if(!invite)return res.status(503).type('text/plain').send('Invitation Discord indisponible.');
+ return res.redirect(302,invite);
+});
 
 const controller=(fn)=>async(req,res,next)=>{try{await fn(req,res,next)}catch(e){next(e)}};
 app.get('/health',controller(async(req,res)=>{
