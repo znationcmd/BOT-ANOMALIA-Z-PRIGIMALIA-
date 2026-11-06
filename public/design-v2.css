@@ -266,3 +266,22 @@ body{background:#08090a;color:#f6f1e8;overflow-x:clip}
 @media(prefers-reduced-motion:reduce){
  .command-link,.button,.icon-button{transition:none}
 }
+
+
+/* Compact grouped navigation — browse categories without forty simultaneous links. */
+.nav-group{margin:2px 0 4px;border:1px solid transparent;border-radius:10px}
+.nav-group[open]{background:#ffffff05;border-color:#ffffff0e}
+.nav-group-head{
+ display:flex;align-items:center;justify-content:space-between;gap:7px;
+ cursor:pointer;list-style:none;user-select:none;
+ margin:0;padding:12px 11px;min-height:41px;
+ color:#ae9e88;font-size:10px;letter-spacing:.05em;font-weight:850
+}
+.nav-group-head::-webkit-details-marker{display:none}
+.nav-group-head:before{content:'▸';color:#d7af70;font-size:10px;transition:transform .15s;margin-right:4px}
+.nav-group[open]>.nav-group-head:before{transform:rotate(90deg)}
+.nav-group-head span:first-child{flex:1;min-width:0}
+.nav-group-count{font-size:9px;min-width:21px;text-align:center;border-radius:6px;padding:3px 4px;background:#ffffff10;color:#c3ac8e;letter-spacing:0}
+.nav-group-items{padding:0 5px 8px}
+.nav-group-items .nav-link{padding:8px 10px;min-height:37px;font-size:11px}
+.nav-group-items .nav-link.active{box-shadow:inset 3px 0 0 #ffb849}
