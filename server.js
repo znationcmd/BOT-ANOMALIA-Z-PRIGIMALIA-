@@ -151,4 +151,4 @@ const botApplicationId=String(bot?.application?.id||bot?.user?.id||'');
 const oauthRedirect=String(process.env.PUBLIC_BASE_URL||'').replace(/\/$/,'')+'/api/auth/callback';
 console.log('ANOMALIA OAuth2: client_id='+oauthClientId+' redirect_uri='+oauthRedirect);
 if(botApplicationId&&oauthClientId&&botApplicationId!==oauthClientId)
- console.error('ANOMALIA OAuth2: DISCORD_CLIENT_ID ne correspond pas à l’application du bot Discord.');
+ console.error('ANOMALIA OAuth2: DISCORD_CLIENT_ID='+oauthClientId+' diffère du BOT_APPLICATION_ID='+botApplicationId+' (identifiants publics).');
