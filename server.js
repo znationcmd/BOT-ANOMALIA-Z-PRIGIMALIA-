@@ -144,4 +144,5 @@ app.use((err,req,res,next)=>{
 await initStore();
 app.listen(port,'0.0.0.0',()=>console.log("Dashboard ANOMALIA’Z actif sur 0.0.0.0:"+port));
 const bot=await startDiscord();
-state.discord=bot?.isReady?.()?bot:null;
+// Keep the client reference even if the Discord ready event fires after login resolves.
+state.discord=typeof bot?.isReady==='function'?bot:null;
