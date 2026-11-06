@@ -222,6 +222,8 @@ function render(){
   ${guilds.map(g=>`<option value="${html(g.id)}" ${g.id===state.session.guildId?'selected':''}>${html(g.name)}</option>`).join('')}</select></div>`:'';
  $('#main').innerHTML=selector+page;
  $('#sidebar').classList.remove('open');
+ $('#mobileMenu').setAttribute('aria-expanded','false');
+ document.querySelectorAll('.mobile-quicknav a').forEach(a=>{const active=a.getAttribute('href')==='#'+state.module;if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
 }
 async function loadOverview(){
  if(!authed()){state.overview=null;return}
@@ -283,7 +285,8 @@ async function decodeSignal(){
 }
 function bind(){
  $('#navSearch').addEventListener('input',renderNavigation);
- $('#mobileMenu').addEventListener('click',()=>$('#sidebar').classList.toggle('open'));
+ $('#mobileMenu').addEventListener('click',()=>{const open=$('#sidebar').classList.toggle('open');$('#mobileMenu').setAttribute('aria-expanded',String(open));});
+ $('#closeMobileMenu').addEventListener('click',()=>{$('#sidebar').classList.remove('open');$('#mobileMenu').setAttribute('aria-expanded','false');});
  $('#refreshBtn').addEventListener('click',async()=>{try{state.status=await api('/api/status');await navigate();toast('Données actualisées.')}catch(e){toast(e.message)}});
  $('#closeModal').addEventListener('click',closeModal);$('#cancelModal').addEventListener('click',closeModal);
  $('#modal').addEventListener('click',event=>{if(event.target.id==='modal')closeModal()});
@@ -319,7 +322,7 @@ function bind(){
    catch(err){$('#toolResult').textContent='ERREUR : '+err.message}return;
   }
  });
- document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#sidebar').classList.remove('open');closeModal()}});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('#sidebar').classList.remove('open');$('#mobileMenu').setAttribute('aria-expanded','false');closeModal()}});
  window.addEventListener('hashchange',navigate);
  const updateClock=()=>$('#clock').textContent=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
  updateClock();setInterval(updateClock,30000);
