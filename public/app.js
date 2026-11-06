@@ -332,6 +332,25 @@ async function bootstrap(){
   Object.assign(state,{catalog,status,session,game});bind();await navigate();
   const auth=URLSearchParams?new URLSearchParams(location.search).get('auth'):null;
   if(auth)toast('Connexion Discord : '+auth);
- }catch(e){$('#main').innerHTML='<div class="login-card"><img class="login-logo" src="/brand.svg" alt=""><h1>ANOMALIA’Z PRIGIMALIA</h1><p>Dashboard temporairement indisponible : '+html(e.message)+'</p><button class="button primary" onclick="location.reload()">Réessayer</button></div>'}
+ }catch(e){$('#main').innerHTML='<div class="login-card"><img class="login-logo" src="/media/anomaliaz-icon-192.webp" alt=""><h1>ANOMALIA’Z PRIGIMALIA</h1><p>Dashboard temporairement indisponible : '+html(e.message)+'</p><button class="button primary" onclick="location.reload()">Réessayer</button></div>'}
 }
+
+// Responsive tactile feedback: keyboard, mouse and touch all illuminate controls.
+function energize(target){
+ if(!target||target.disabled||target.getAttribute('aria-disabled')==='true')return;
+ target.classList.remove('is-energized');
+ void target.offsetWidth;
+ target.classList.add('is-energized');
+ setTimeout(()=>target.classList.remove('is-energized'),680);
+}
+document.addEventListener('pointerdown',event=>{
+ const button=event.target.closest('.button,.nav-link,.feature-card,.icon-button,.mobile-menu,.table-actions button,.studio-prompt button');
+ if(button)energize(button);
+},true);
+document.addEventListener('keydown',event=>{
+ if(event.key!=='Enter'&&event.key!==' ')return;
+ const target=event.target.closest('.button,.nav-link,.feature-card,.icon-button,.mobile-menu,.table-actions button,.studio-prompt button');
+ if(target)energize(target);
+},true);
+
 bootstrap();
