@@ -116,38 +116,38 @@ function overview(){
  const linkItem=id=>'<a class="command-link" href="#'+html(id)+'"><span class="command-icon">'+(sym[id]||'◈')+'</span><span class="command-copy"><strong>'+html(title(id))+'</strong><small>'+html((state.catalog.modules[id]?.description||'').slice(0,92))+'</small></span><span class="command-arrow" aria-hidden="true">›</span></a>';
  const panels=groups.map(g=>'<section class="command-pane"><div class="command-pane-head"><span class="command-pane-symbol">'+g.icon+'</span><div><h3>'+g.name+'</h3><p>'+g.desc+'</p></div></div><div class="command-links">'+g.ids.filter(id=>state.catalog.modules[id]).map(linkItem).join('')+'</div></section>').join('');
  const recent=state.overview?.events?.length?state.overview.events.slice(0,4).map(e=>'<div class="activity-row"><span>'+html(e.type)+'</span><time>'+html(dateString(e.at))+'</time></div>').join(''):'<p class="activity-empty">Aucune télémétrie Unreal Engine reçue. Le bridge du jeu n’est pas connecté.</p>';
- return \`<section class="hero hero-cinematic" aria-label="ANOMALIA’Z PRIGIMALIA">
+ return `<section class="hero hero-cinematic" aria-label="ANOMALIA’Z PRIGIMALIA">
   <div class="hero-content">
    <div class="microtag">CMD STUDIO <span class="micro-separator">/</span> ANOMALIA’Z PRIGIMALIA</div>
    <div class="hero-action-box">
     <span class="hero-overline">DASHBOARD · CENTRE DE CONTRÔLE</span>
     <h1>Centre de commande</h1>
     <p>Administration du monde, des joueurs et des serveurs.</p>
-    <div class="hero-actions">\${link('editor','◈ ANOMALIA Éditor','primary')}\${link('tools','⚒ ANOMALIA Tools','outline')}</div>
+    <div class="hero-actions">${link('editor','◈ ANOMALIA Éditor','primary')}${link('tools','⚒ ANOMALIA Tools','outline')}</div>
    </div>
   </div></section>
-  \${noticeForLogin()}
+  ${noticeForLogin()}
   <section class="overview-kpis" aria-label="Indicateurs du réseau">
-   <div class="section-head compact"><div><span class="section-kicker">RÉSEAU ANOMALIA’Z</span><h2>Vue d’ensemble</h2></div><span class="overview-live \${state.status?.discordConnected?'online':'offline'}">● \${state.status?.discordConnected?'Bot Discord en ligne':'Bot Discord hors ligne'}</span></div>
+   <div class="section-head compact"><div><span class="section-kicker">RÉSEAU ANOMALIA’Z</span><h2>Vue d’ensemble</h2></div><span class="overview-live ${state.status?.discordConnected?'online':'offline'}">● ${state.status?.discordConnected?'Bot Discord en ligne':'Bot Discord hors ligne'}</span></div>
    <div class="grid metric-grid">
-    \${metric('Statut du bot',state.status?.discordConnected?'ACTIF':'OFFLINE','Connexion Discord','status')}
-    \${metric('Serveurs',memberCount,isAdmin?'Administrables':'Connexion nécessaire','servers')}
-    \${metric('Survivants',isAdmin?counts.players||0:'—',isAdmin?'Profils enregistrés':'Connexion nécessaire','players')}
-    \${metric('Whitelist',isAdmin?counts.whitelist||0:'—',isAdmin?'Demandes enregistrées':'Connexion nécessaire','whitelist')}
+    ${metric('Statut du bot',state.status?.discordConnected?'ACTIF':'OFFLINE','Connexion Discord','status')}
+    ${metric('Serveurs',memberCount,isAdmin?'Administrables':'Connexion nécessaire','servers')}
+    ${metric('Survivants',isAdmin?counts.players||0:'—',isAdmin?'Profils enregistrés':'Connexion nécessaire','players')}
+    ${metric('Whitelist',isAdmin?counts.whitelist||0:'—',isAdmin?'Demandes enregistrées':'Connexion nécessaire','whitelist')}
    </div>
   </section>
   <section class="overview-modules" aria-label="Modules de gestion">
    <div class="section-head compact"><div><span class="section-kicker">ESPACES DE TRAVAIL</span><h2>Gestion des services</h2></div><span>Choisis un domaine à administrer</span></div>
-   <div class="command-grid">\${panels}</div>
+   <div class="command-grid">${panels}</div>
   </section>
   <section class="overview-bottom">
    <div class="compact-panel"><div class="compact-panel-head"><h3>État des intégrations</h3><a href="#integrations">Configurer ›</a></div><div class="details-list">
-    \${infoLine('Stockage',state.status?.storage==='postgres'?'PostgreSQL':'Stockage local')}
-    \${infoLine('Authentification',state.status?.oauth?'Configuration détectée':'Non configurée')}
-    \${infoLine('Unreal Engine',state.overview?.gameConnection||'Aucune télémétrie')}
+    ${infoLine('Stockage',state.status?.storage==='postgres'?'PostgreSQL':'Stockage local')}
+    ${infoLine('Authentification',state.status?.oauth?'Configuration détectée':'Non configurée')}
+    ${infoLine('Unreal Engine',state.overview?.gameConnection||'Aucune télémétrie')}
    </div></div>
-   <div class="compact-panel"><div class="compact-panel-head"><h3>Activité du jeu</h3><span>Derniers événements</span></div><div class="activity-list">\${recent}</div></div>
-  </section>\`;
+   <div class="compact-panel"><div class="compact-panel-head"><h3>Activité du jeu</h3><span>Derniers événements</span></div><div class="activity-list">${recent}</div></div>
+  </section>`;
 }
 function infoLine(k,v){return `<div class="info-line"><span>${html(k)}</span><strong>${html(v)}</strong></div>`}
 function heading(id){
