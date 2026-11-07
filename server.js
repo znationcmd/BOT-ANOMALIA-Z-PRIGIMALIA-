@@ -6,6 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {initStore,readGuildData,listRecords,createRecord,updateRecord,deleteRecord,getStatus,addGameEvent,mutateGuild} from './lib/store.js';
 import {MODULES,GROUPS,FIELDS,validateEntry} from './lib/modules.js';
 import {BUNKERS,ANTENNAS,decodeMorse,encodeMorse} from './lib/game-data.js';
+import {BASE_MAPS,buildMapExplorer} from './lib/map-catalog.js';
 import {authConfig,oauthStart,oauthCallback,authRequired,csrfRequired,selectGuild,logout,sessionInfo,session} from './lib/auth.js';
 import {startDiscord} from './bot.js';
 
@@ -66,6 +67,17 @@ app.get('/api/discord/servers',(req,res)=>{
   }).sort((a,b)=>a.name.localeCompare(b.name,'fr'));
  res.json({connected,guilds,selectedGuildId:userSession.guildId||null});
 });
+// Public map index; private markers and custom map imagery are only returned
+// for the authorized Discord guild selected in the administrator's session.
+app.get('/api/maps/explorer',controller(async(req,res)=>{
+ const active=session(req);
+ if(!active?.guildId||!active.guilds?.some(g=>g.id===active.guildId)){
+  return res.json({maps:BASE_MAPS,features:[],scope:'public',dataStatus:'catalog-only'});
+ }
+ const doc=await readGuildData(active.guildId);
+ const modules=doc.modules||{};
+ res.json(buildMapExplorer({guildMaps:modules.maps||[],locations:modules.locations||[],loot:modules.loot||[],vehicles:modules.vehicles||[]}));
+}));
 app.get('/api/catalog',(req,res)=>res.json({groups:GROUPS,modules:MODULES,fields:FIELDS}));
 app.get('/api/game-data',(req,res)=>res.json({bunkers:BUNKERS,antennas:ANTENNAS,source:'sample-data-not-guild-specific',live:false,frequencyMHz:80}));
 app.post('/api/morse/decode',controller(async(req,res)=>{
