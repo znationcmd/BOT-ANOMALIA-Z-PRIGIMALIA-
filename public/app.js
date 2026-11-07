@@ -1,3 +1,4 @@
+import {mountMapExplorer} from './map-explorer.js';
 const state={
  catalog:null,session:null,status:null,game:null,overview:null,records:[],module:'overview',
  search:'',filter:'',loading:false,guildServers:null,guildError:null
@@ -192,6 +193,37 @@ function modulePage(id){
  ${id==='whitelist'?'<div class="notice">La validation met à jour la demande de ce Discord. L’accès automatique à un serveur de jeu nécessite une intégration adaptée, si vous en utilisez un.</div>':''}
  ${id==='builds'?'<div class="notice info">Ce module suit les versions configurées pour ce serveur. Il ne lance pas de compilation à distance.</div>':''}`;
 }
+function mapsPage(){
+ const shell=[
+ "<section class='atlas' id='mapsExplorer' aria-label='Explorateur cartographique ANOMALIA’Z'>",
+ "<header class='atlas-heading'><div><span class='section-overline'>ATLAS INTERACTIF · MULTI-DISCORD</span><h2>Explorer les cartes</h2><p>Choisis une carte pour l'ouvrir. Recherche les objets, véhicules et lieux configurés pour ton serveur.</p></div><div class='atlas-catalog-count' id='atlasCatalogCount'>Chargement…</div></header>",
+ "<div class='atlas-layout'><aside class='atlas-sidebar' aria-label='Catalogue des cartes'>",
+ "<div class='atlas-field'><label for='atlasFamily'>Collection</label><select id='atlasFamily' class='input'><option value='all'>Toutes les collections</option></select></div>",
+ "<div class='atlas-field'><label for='atlasCatalogSearch'>Rechercher une carte</label><input id='atlasCatalogSearch' class='input' type='search' placeholder='Ex. Sakhal, SKARVIK…' autocomplete='off'></div>",
+ "<div class='atlas-list' id='atlasCatalog'><p class='atlas-empty'>Chargement des cartes…</p></div></aside>",
+ "<div class='atlas-workspace'><div class='atlas-top'>",
+ "<div class='atlas-field'><label for='atlasMapSelect'>Carte sélectionnée</label><select id='atlasMapSelect' class='input'><option value=''>Choisir une carte…</option></select></div>",
+ "<div class='atlas-heading-mini'><h3 id='atlasTitle'>Sélectionner une carte</h3><span id='atlasStatus'>Fond non chargé</span></div>",
+ "<div class='atlas-filters'><div class='atlas-field'><label for='atlasSearch'>Rechercher un item, véhicule ou lieu</label><input id='atlasSearch' type='search' class='input' placeholder='Ex. M4, véhicule, bunker…' autocomplete='off'></div>",
+ "<div class='atlas-field'><label for='atlasMarkerType'>Affichage</label><select id='atlasMarkerType' class='input'><option value='all'>Tous les repères</option><option value='item'>Objets et loot</option><option value='vehicle'>Véhicules</option><option value='location'>Lieux</option></select></div>",
+ "<div class='atlas-field'><label for='atlasTier'>Tier</label><select id='atlasTier' class='input'><option value='all'>Tous les tiers</option><option value='1'>Tier 1</option><option value='2'>Tier 2</option><option value='3'>Tier 3</option><option value='4'>Tier 4</option><option value='5'>Tier 5</option><option value='unique'>Unique</option></select></div>",
+ "<label class='atlas-zones-toggle'><input type='checkbox' id='atlasShowZones' checked> Zones des tiers</label></div></div>",
+ "<div class='atlas-viewer' id='atlasViewer' tabindex='0' aria-label='Carte interactive : glisser pour déplacer, deux doigts ou molette pour zoomer'>",
+ "<div class='atlas-scene' id='atlasScene'><div id='atlasBase' class='atlas-base missing-image'><div class='atlas-placeholder'><strong>Choisir une carte</strong><span>Le visualiseur cartographique s'ouvrira ici.</span></div></div><div id='atlasZones' class='atlas-zones'></div><div id='atlasMarkers' class='atlas-markers'></div></div>",
+ "<div class='atlas-view-controls' aria-label='Commandes de la carte'><button type='button' data-atlas-action='zoom-in' aria-label='Zoomer'>+</button><button type='button' data-atlas-action='zoom-out' aria-label='Dézoomer'>−</button><button type='button' data-atlas-action='reset'>Centrer</button><button type='button' data-atlas-action='expand' aria-pressed='false'>Plein écran</button></div>",
+ "<div class='atlas-coord'><span id='atlasCoordinates'>X — · Z —</span><span id='atlasZoomValue'>100 %</span></div></div>",
+ "<div class='atlas-summary'><span id='atlasCount'>0 repère</span><span id='atlasDataInfo'>Seules les données vérifiées sont affichées.</span><a id='atlasReference' href='#' target='_blank' rel='noopener noreferrer' hidden>Voir une carte de référence ↗</a></div>",
+ "<div class='atlas-detail' id='atlasDetail' role='status'>Sélectionne une carte. Pince avec deux doigts ou utilise la molette pour zoomer.</div>",
+ "<div class='atlas-results' id='atlasResults'><p class='atlas-empty'>Choisis une carte pour afficher ses emplacements.</p></div></div></div></section>",
+ "<div class='notice info atlas-disclaimer'>Le catalogue recense des cartes connues, mais ne contient pas leurs fonds satellites par défaut. Les administrateurs peuvent associer une image autorisée, des dimensions, des zones de tiers et des coordonnées de loot et de véhicules. Les repères ne garantissent pas les apparitions.</div>"
+ ].join('');
+ const admin=authed()?
+ "<section class='atlas-admin'><div class='section-head'><h2>Configurer les cartes de ce Discord</h2><span>Images, coordonnées et zones de tiers</span></div><div class='card'>"+
+ sectionToolbar('maps')+
+ "<div class='atlas-admin-tip'>Pour activer un fond, utilise le nom exact de la carte, l'URL HTTPS de son image et les dimensions X/Z. Les zones de tiers sont au format JSON. Ajoute les objets et véhicules dans leurs modules avec le nom de la carte et les coordonnées.</div>"+
+ valuesTable('maps')+"</div></section>":'';
+ return heading('maps')+noticeForLogin()+shell+admin;
+}
 function editorPage(){
  return heading('editor')+noticeForLogin()+
  `<div class="two-col"><div class="card"><p class="section-overline">ANOMALIA ÉDITOR</p><h2>Configuration du serveur</h2>
@@ -285,6 +317,7 @@ function render(){
  renderNavigation();renderUser();renderGuildList();
  let page;
  if(id==='overview')page=overview();
+ else if(id==='maps')page=mapsPage();
  else if(id==='editor')page=editorPage();
  else if(id==='tools')page=toolsPage();
  else if(id==='bunkers')page=bunkersPage();
@@ -292,7 +325,9 @@ function render(){
  else if(id==='settings')page=settingsPage();
  else if(id==='integrations')page=integrationsPage();
  else page=modulePage(id);
+ $('#mapsExplorer')?._atlasCleanup?.();
  $('#main').innerHTML=page;
+ if(id==='maps')mountMapExplorer($('#mapsExplorer'),api);
  $('#sidebar').classList.remove('open');
  $('#mobileMenu').setAttribute('aria-expanded','false');
  document.querySelectorAll('.mobile-quicknav a').forEach(a=>{const active=a.getAttribute('href')==='#'+state.module;if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
