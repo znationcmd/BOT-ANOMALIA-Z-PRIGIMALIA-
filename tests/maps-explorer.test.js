@@ -8,42 +8,49 @@ import {BASE_MAPS,buildMapExplorer,safeImageUrl,safeTierZones} from '../lib/map-
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>readFile(path.join(root,file),'utf8');
 
-test('catalog contains real terrain names, not fictional item spawn locations',()=>{
- for(const name of ['Chernarus+','Livonia','Sakhal','Nasdara / Badlands','Namalsk','Deer Isle','SKARVIK','DRAZOVIA','F.A.L.C']){
-  assert.ok(BASE_MAPS.some(m=>m.name===name),name);
- }
- assert.ok(BASE_MAPS.length>=20);
- assert.ok(BASE_MAPS.every(m=>m.imageUrl===null&&m.width===null));
+test('catalog contains only the fifteen ANOMALIA’Z PRIGIMALIA maps',()=>{
+ const original=['SKARVIK','DRAZOVIA','KARSKOV','VORGRAD','NEMORIS','DRAKHEIM','SOLYNACALYRA',
+ 'NEXAVARKHOS','CHERNASKALUXRIA','F.A.L.C','KOLCHIEM ORIGINS'];
+ const added=['ROSКАТVIA-B1','НОГОКВ-51','PARADISIOMANIA','DEADROOT'];
+ assert.equal(BASE_MAPS.length,15);
+ assert.deepEqual(new Set(BASE_MAPS.map(m=>m.name)),new Set([...original,...added]));
+ assert.ok(BASE_MAPS.every(m=>m.family.startsWith('ANOMALIA’Z')&&m.imageUrl===null&&m.width===null));
+ for(const foreign of ['Chernarus+','Livonia','Sakhal','Deer Isle','Namalsk'])assert.ok(!BASE_MAPS.some(m=>m.name===foreign));
  assert.deepEqual(buildMapExplorer().features,[]);
 });
 
-test('one Discord configures its own map image, tier zones and item/vehicle positions',()=>{
+test('guild-specific image, tier and spawn coordinates work on an original world',()=>{
  const out=buildMapExplorer({
-  guildMaps:[{name:'Chernarus+',imageUrl:'https://example.org/community-map.webp',width:10000,height:10000,
+  guildMaps:[{name:'SKARVIK',imageUrl:'https://example.org/skarvik.webp',width:10000,height:10000,
    tierZones:JSON.stringify([{tier:'3',x:2000,z:3000,width:500,height:800}])}],
-  locations:[{name:'Camp',map:'Chernarus+',x:1000,z:4500,tier:'2',type:'base'}],
-  loot:[{name:'M4A1',map:'Chernarus+',x:2100,z:3200,tier:'3'}],
-  vehicles:[{name:'4x4',map:'Chernarus+',x:7500,z:9000,tier:'1'}]
+  locations:[{name:'Camp',map:'SKARVIK',x:1000,z:4500,tier:'2',type:'base'}],
+  loot:[{name:'Objet rare',map:'SKARVIK',x:2100,z:3200,tier:'3'}],
+  vehicles:[{name:'4x4',map:'SKARVIK',x:7500,z:9000,tier:'1'}]
  });
- const map=out.maps.find(m=>m.id==='chernarus');
+ const map=out.maps.find(m=>m.id==='skarvik');
  assert.ok(map.configured);
- assert.equal(map.imageUrl,'https://example.org/community-map.webp');
+ assert.equal(map.imageUrl,'https://example.org/skarvik.webp');
  assert.equal(map.tierZones.length,1);
  assert.deepEqual(new Set(out.features.map(f=>f.category)),new Set(['location','item','vehicle']));
- assert.equal(out.features.find(f=>f.name==='M4A1').tier,'3');
- assert.equal(out.features.find(f=>f.name==='4x4').mapId,'chernarus');
- assert.deepEqual(buildMapExplorer().features,[],'no features bleed between two guilds');
+ assert.equal(out.features.find(f=>f.name==='Objet rare').tier,'3');
+ assert.equal(out.features.find(f=>f.name==='4x4').mapId,'skarvik');
+ assert.deepEqual(buildMapExplorer().features,[],'no leak between Discord servers');
 });
 
-test('invalid images and fake coordinates are dropped instead of displayed',()=>{
+test('reject external game maps, invalid image URLs and impossible coordinates',()=>{
  assert.equal(safeImageUrl('javascript:alert(1)'),null);
  assert.equal(safeImageUrl('http://example.com/map.png'),null);
  assert.equal(safeImageUrl('https://example.com/invalid.svg'),null);
  assert.equal(safeTierZones('[{"tier":"2","x":900,"z":0,"width":500,"height":100}]',1000,1000).length,0);
  const out=buildMapExplorer({
-  guildMaps:[{name:'Deer Isle',width:1000,height:1000}],
-  loot:[{name:'Impossible',map:'Deer Isle',x:1500,z:30},{name:'Sans coordonnées',map:'Deer Isle'}]
+  guildMaps:[{name:'Chernarus+',imageUrl:'https://example.org/other-game.webp',width:1000,height:1000},
+             {name:'DRAZOVIA',width:1000,height:1000}],
+  loot:[{name:'Impossible',map:'DRAZOVIA',x:1500,z:30},
+        {name:'Sans coordonnées',map:'DRAZOVIA'},
+        {name:'Autre jeu',map:'Chernarus+',x:20,z:20}]
  });
+ assert.equal(out.maps.length,15);
+ assert.ok(!out.maps.some(m=>m.name==='Chernarus+'));
  assert.equal(out.features.length,0);
 });
 
