@@ -1,7 +1,7 @@
 /* ANOMALIA’Z Progressive Web App. Version injected by the Railway deployment. */
 const VERSION='__BUILD_ID__';
 const CACHE='anomaliaz-shell-'+VERSION;
-const SHELL=['/','/offline.html','/index.html','/style.css','/app.js','/pwa.js','/manifest.webmanifest','/media/anomaliaz-world.webp','/icons/anomalia-maskable-192.png','/icons/anomalia-maskable-512.png','/icons/anomalia-192.png','/icons/anomalia-512.png','/icons/apple-icon.png'];
+const SHELL=['/','/offline.html','/index.html','/style.css','/design-v2.css','/map-explorer.css','/app.js','/map-explorer.js','/pwa.js','/manifest.webmanifest','/media/anomaliaz-world.webp','/icons/anomalia-maskable-192.png','/icons/anomalia-maskable-512.png','/icons/anomalia-192.png','/icons/anomalia-512.png','/icons/apple-icon.png'];
 self.addEventListener('install',event=>{
  event.waitUntil((async()=>{
   const cache=await caches.open(CACHE);
@@ -37,7 +37,7 @@ self.addEventListener('fetch',event=>{
  event.respondWith((async()=>{
   try{
    const response=await fetch(request,{cache:'no-store'});
-   if(response.ok && /^(\/style\.css|\/app\.js|\/pwa\.js|\/manifest\.webmanifest|\/media\/)/.test(url.pathname)){
+   if(response.ok && /^(\/style\.css|\/design-v2\.css|\/map-explorer\.css|\/app\.js|\/map-explorer\.js|\/pwa\.js|\/manifest\.webmanifest|\/media\/)/.test(url.pathname)){
     const cache=await caches.open(CACHE);
     await cache.put(url.pathname,response.clone());
    }
