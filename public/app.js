@@ -90,7 +90,7 @@ function renderUser(){
  }
  $('#connectionLight').className='live-light'+(state.status?.discordConnected?' ok':' warn');
  $('#connectionLabel').textContent=state.status?.discordConnected?'DISCORD CONNECTÉ':'BOT DÉCONNECTÉ';
- $('#footerState').textContent=state.status?.storage==='postgres'?'BASE POSTGRES':'STOCKAGE LOCAL';
+ $('#footerState').textContent='DONNÉES PAR DISCORD';
 }
 function metric(label,value,foot,symbol){return `<article class="metric"><div class="metric-top"><span>${html(label)}</span><span class="metric-symbol">${sym[symbol]||'◈'}</span></div><div class="metric-value">${html(value)}</div><div class="metric-foot">${html(foot)}</div></article>`}
 function noticeForLogin(){
