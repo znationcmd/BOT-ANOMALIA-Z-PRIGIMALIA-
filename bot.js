@@ -1,8 +1,7 @@
 import crypto from 'node:crypto';
 import {Client,GatewayIntentBits,SlashCommandBuilder,PermissionFlagsBits,MessageFlags} from 'discord.js';
-import {createRecord,listRecords,mutateGuild,readGuildData,getStatus} from './lib/store.js';
+import {createRecord,listRecords,mutateGuild,readGuildData} from './lib/store.js';
 import {BUNKERS,decodeMorse} from './lib/game-data.js';
-import {GAME_REPO} from './lib/modules.js';
 
 const commands=[
  new SlashCommandBuilder().setName('anomalia').setDescription('ANOMALIA’Z PRIGIMALIA : serveur, outils et Dashboard')
@@ -38,10 +37,9 @@ async function handle(interaction){
  const name=interaction.commandName,sub=interaction.options.getSubcommand(false),guildId=interaction.guildId,user=interaction.user;
  if(name==='anomalia'){
   if(sub==='dashboard')return privateResponse(interaction,'🩸 **Dashboard ANOMALIA’Z PRIGIMALIA**\n'+(dash()||'Lien non configuré sur Railway.'));
-  if(sub==='editor')return privateResponse(interaction,'🛠️ ANOMALIA Éditor : '+(dash()?dash()+'/#editor':'Dashboard à configurer')+'\nProjet : '+GAME_REPO+'/blob/main/src/map-editor.js');
-  if(sub==='tools')return privateResponse(interaction,'🧰 ANOMALIA Tools : '+(dash()?dash()+'/#tools':'Dashboard à configurer')+'\nScripts : '+GAME_REPO+'/tree/main/scripts');
-  const status=await getStatus();
-  return privateResponse(interaction,'🎮 **ANOMALIA’Z PRIGIMALIA**\nBot Discord : connecté\nStockage : '+status.mode+'\nTélémétrie Unreal : '+(process.env.GAME_BRIDGE_SECRET?'bridge configuré (sans garantie que le jeu émette)':'non connectée')+'\nDashboard : '+(dash()||'domaine à configurer'));
+  if(sub==='editor')return privateResponse(interaction,'🛠️ ANOMALIA Éditor pour ton serveur Discord : '+(dash()?dash()+'/#editor':'Dashboard à configurer'));
+  if(sub==='tools')return privateResponse(interaction,'🧰 ANOMALIA Tools pour ta communauté : '+(dash()?dash()+'/#tools':'Dashboard à configurer'));
+  return privateResponse(interaction,'🤖 **ANOMALIA’Z PRIGIMALIA**\nBot Discord multi-serveurs : connecté\nConfiguration indépendante pour chaque communauté.\nDashboard : '+(dash()||'domaine à configurer'));
  }
  if(name==='whitelist'){
   const already=(await listRecords(guildId,'whitelist')).find(x=>x.playerId===user.id&&x.status==='pending');
@@ -74,7 +72,7 @@ async function handle(interaction){
     doc.modules.deliveries.unshift(delivery);
     return {action:'purchase',name:item.name,remaining:player.credits,deliveryId:delivery.id};
    });
-   return privateResponse(interaction,'✅ Achat enregistré : '+result.name+'. Solde : '+result.remaining+' crédits. Livraison **en attente** dans le Dashboard : aucune attribution automatique dans Unreal Engine.');
+   return privateResponse(interaction,'✅ Achat enregistré : '+result.name+'. Solde : '+result.remaining+' crédits. Livraison **en attente** dans le Dashboard. Une intégration externe est nécessaire pour toute livraison en jeu.');
   }catch(e){return privateResponse(interaction,'❌ '+e.message)}
  }
  if(name==='pass'){
@@ -82,12 +80,12 @@ async function handle(interaction){
   const player=(data.modules.players||[]).find(x=>x.discordId===user.id);
   if(!player)return privateResponse(interaction,'Aucun profil de joueur relié à ton Discord. Le pass sera disponible après inscription par les administrateurs ou connexion du jeu.');
   const rewards=(data.modules.battlepass||[]).filter(x=>Number(x.level)<=Number(player.level||0)).length;
-  return privateResponse(interaction,'🏆 **Pass de combat ANOMALIA**\nNiveau '+(player.level||0)+' · XP '+(player.xp||0)+'\nPaliers débloqués : '+rewards+'\nLes récompenses ne sont pas livrées en jeu sans bridge Unreal.');
+  return privateResponse(interaction,'🏆 **Pass de combat ANOMALIA**\nNiveau '+(player.level||0)+' · XP '+(player.xp||0)+'\nPaliers débloqués : '+rewards+'\nToute livraison en jeu dépend des intégrations activées par les administrateurs de ce serveur.');
  }
  if(name==='bunker'){
   const access=interaction.options.getString('acces');
   const filtered=BUNKERS.filter(x=>!access||x.access===access).slice(0,23);
-  return privateResponse(interaction,'🔐 **Bunkers ANOMALIA (prototype)**\n'+filtered.map(b=>'• '+b.name+' · '+({key:'clé',card:'carte',morse:'Morse'}[b.access])+' · grille '+b.grid).join('\n'));
+  return privateResponse(interaction,'🔐 **Bunkers d’exemple (catalogue de démonstration)**\n'+filtered.map(b=>'• '+b.name+' · '+({key:'clé',card:'carte',morse:'Morse'}[b.access])+' · grille '+b.grid).join('\n'));
  }
  if(name==='morse'){
   try{
