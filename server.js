@@ -46,7 +46,6 @@ app.get('/health',controller(async(req,res)=>{
  });
 }));
 app.get('/api/status',controller(async(req,res)=>{
- const s=await getStatus();
  res.json({online:true,discordConnected:Boolean(state.discord?.isReady?.()),oauth:authConfig().ready,
   time:new Date().toISOString()});
 }));
