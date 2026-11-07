@@ -47,7 +47,7 @@ app.get('/health',controller(async(req,res)=>{
 }));
 app.get('/api/status',controller(async(req,res)=>{
  const s=await getStatus();
- res.json({online:true,discordConnected:Boolean(state.discord?.isReady?.()),storage:s.mode,oauth:authConfig().ready,
+ res.json({online:true,discordConnected:Boolean(state.discord?.isReady?.()),oauth:authConfig().ready,
   time:new Date().toISOString()});
 }));
 // Only reveal installed Discord guild names to members who administer those guilds.
@@ -128,7 +128,7 @@ app.post('/api/tools/validate',authRequired,csrfRequired,(req,res)=>{
   const obj=JSON.parse(raw);
   if(!obj||typeof obj!=='object'||Array.isArray(obj))throw new Error('Objet JSON attendu.');
   const keys=Object.keys(obj);
-  res.json({valid:true,keys:keys.slice(0,50),size:raw.length,message:'JSON valide. Validation syntaxique uniquement : aucune importation dans Unreal Engine.'});
+  res.json({valid:true,keys:keys.slice(0,50),size:raw.length,message:'JSON valide. Vérification syntaxique uniquement : aucune modification appliquée.'});
  }catch(e){res.status(400).json({valid:false,error:e.message})}
 });
 app.post('/api/discord/announce',authRequired,csrfRequired,controller(async(req,res)=>{
