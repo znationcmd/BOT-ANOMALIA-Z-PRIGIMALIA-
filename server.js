@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {initStore,readGuildData,listRecords,createRecord,updateRecord,deleteRecord,getStatus,addGameEvent,mutateGuild} from './lib/store.js';
-import {MODULES,GROUPS,FIELDS,validateEntry,GAME_REPO} from './lib/modules.js';
+import {MODULES,GROUPS,FIELDS,validateEntry} from './lib/modules.js';
 import {BUNKERS,ANTENNAS,decodeMorse,encodeMorse} from './lib/game-data.js';
 import {authConfig,oauthStart,oauthCallback,authRequired,csrfRequired,selectGuild,logout,sessionInfo,session} from './lib/auth.js';
 import {startDiscord} from './bot.js';
@@ -48,7 +48,7 @@ app.get('/health',controller(async(req,res)=>{
 app.get('/api/status',controller(async(req,res)=>{
  const s=await getStatus();
  res.json({online:true,discordConnected:Boolean(state.discord?.isReady?.()),storage:s.mode,oauth:authConfig().ready,
-  gameBridgeConfigured:Boolean(process.env.GAME_BRIDGE_SECRET),time:new Date().toISOString()});
+  time:new Date().toISOString()});
 }));
 // Only reveal installed Discord guild names to members who administer those guilds.
 app.get('/api/discord/servers',(req,res)=>{
@@ -67,8 +67,8 @@ app.get('/api/discord/servers',(req,res)=>{
   }).sort((a,b)=>a.name.localeCompare(b.name,'fr'));
  res.json({connected,guilds,selectedGuildId:userSession.guildId||null});
 });
-app.get('/api/catalog',(req,res)=>res.json({groups:GROUPS,modules:MODULES,fields:FIELDS,gameRepo:GAME_REPO}));
-app.get('/api/game-data',(req,res)=>res.json({bunkers:BUNKERS,antennas:ANTENNAS,source:'game-prototype-reference',live:false,frequencyMHz:80}));
+app.get('/api/catalog',(req,res)=>res.json({groups:GROUPS,modules:MODULES,fields:FIELDS}));
+app.get('/api/game-data',(req,res)=>res.json({bunkers:BUNKERS,antennas:ANTENNAS,source:'sample-data-not-guild-specific',live:false,frequencyMHz:80}));
 app.post('/api/morse/decode',controller(async(req,res)=>{
  const value=String(req.body?.signal||'');
  if(value.length>350)return res.status(400).json({error:'Signal trop long.'});
@@ -83,8 +83,7 @@ app.post('/api/select-guild',authRequired,csrfRequired,selectGuild);
 app.get('/api/overview',authRequired,controller(async(req,res)=>{
  const doc=await readGuildData(req.anomaliaSession.guildId);
  const counts=Object.fromEntries(Object.keys(MODULES).map(id=>[id,(doc.modules?.[id]||[]).length]));
- res.json({counts,events:(doc.events||[]).slice(0,20),audit:(doc.audit||[]).slice(0,20),
-  gameConnection:doc.lastGameEvent?'dernier événement '+doc.lastGameEvent:'aucune télémétrie Unreal reçue',settings:doc.settings,
+ res.json({counts,events:(doc.events||[]).slice(0,20),audit:(doc.audit||[]).slice(0,20),settings:doc.settings,
   discordConnected:Boolean(state.discord?.isReady?.()),storage:(await getStatus()).mode});
 }));
 app.get('/api/modules/:section',authRequired,controller(async(req,res)=>{
@@ -116,7 +115,7 @@ app.put('/api/settings',authRequired,csrfRequired,controller(async(req,res)=>{
 }));
 app.get('/api/editor/export',authRequired,controller(async(req,res)=>{
  const doc=await readGuildData(req.anomaliaSession.guildId);
- const safe={format:'ANOMALIAZ-CMD-CONFIG',version:1,gameRepo:GAME_REPO,source:'dashboard-draft-not-deployed-in-UE5',
+ const safe={format:'ANOMALIAZ-CMD-CONFIG',version:1,source:'discord-guild-dashboard-export',
   guildId:req.anomaliaSession.guildId,exportedAt:new Date().toISOString(),
   world:Object.fromEntries(['maps','locations','bunkers','radio','loot','creatures','vehicles','weather','events','editor','assets'].map(k=>[k,doc.modules?.[k]||[]]))};
  res.setHeader('Content-Disposition','attachment; filename="anomaliaz-editor-export.json"');
