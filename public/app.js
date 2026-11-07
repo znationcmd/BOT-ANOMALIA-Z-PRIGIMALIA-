@@ -15,7 +15,6 @@ const number=(v,f=0)=>Number.isFinite(Number(v))?Number(v):f;
 const dateString=x=>{if(!x)return '—';try{return new Date(x).toLocaleString('fr-FR')}catch{return String(x)}};
 const current=()=>state.module;
 const authed=()=>Boolean(state.session?.authenticated&&state.session.guildId);
-const repoUrl='https://github.com/znationcmd/ANOMALIA-PRIMEVAL-OUTBOUNDUN';
 const title=id=>state.catalog?.modules?.[id]?.label||id;
 function link(id,label,cls=''){return `<a class="button ${cls||'secondary'}" href="#${html(id)}">${html(label)}</a>`}
 function toast(message){const el=$('#toast');el.textContent=message;el.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.hidden=true,4800)}
@@ -115,24 +114,24 @@ function overview(){
  const groups=[
   {name:'Monde & survie',desc:'Paramètres et contenu des cartes',icon:'◱',ids:['maps','loot','bunkers','radio']},
   {name:'Communauté & RP',desc:'Joueurs, accès et progression',icon:'♜',ids:['whitelist','shop','battlepass','rp']},
-  {name:'Administration',desc:'Serveurs et intégrations',icon:'⚙',ids:['servers','players','integrations','settings']}
+  {name:'Administration',desc:'Réglages et services Discord',icon:'⚙',ids:['servers','players','integrations','settings']}
  ];
  const linkItem=id=>'<a class="command-link" href="#'+html(id)+'"><span class="command-icon">'+(sym[id]||'◈')+'</span><span class="command-copy"><strong>'+html(title(id))+'</strong><small>'+html((state.catalog.modules[id]?.description||'').slice(0,92))+'</small></span><span class="command-arrow" aria-hidden="true">›</span></a>';
  const panels=groups.map(g=>'<section class="command-pane"><div class="command-pane-head"><span class="command-pane-symbol">'+g.icon+'</span><div><h3>'+g.name+'</h3><p>'+g.desc+'</p></div></div><div class="command-links">'+g.ids.filter(id=>state.catalog.modules[id]).map(linkItem).join('')+'</div></section>').join('');
- const recent=state.overview?.events?.length?state.overview.events.slice(0,4).map(e=>'<div class="activity-row"><span>'+html(e.type)+'</span><time>'+html(dateString(e.at))+'</time></div>').join(''):'<p class="activity-empty">Aucune télémétrie Unreal Engine reçue. Le bridge du jeu n’est pas connecté.</p>';
+ const recent=state.overview?.events?.length?state.overview.events.slice(0,4).map(e=>'<div class="activity-row"><span>'+html(e.type)+'</span><time>'+html(dateString(e.at))+'</time></div>').join(''):'<p class="activity-empty">Aucune activité enregistrée pour ce serveur.</p>';
  return `<section class="hero hero-cinematic" aria-label="ANOMALIA’Z PRIGIMALIA">
   <div class="hero-content">
    <div class="microtag">CMD STUDIO <span class="micro-separator">/</span> ANOMALIA’Z PRIGIMALIA</div>
    <div class="hero-action-box">
     <span class="hero-overline">DASHBOARD · CENTRE DE CONTRÔLE</span>
     <h1>Centre de commande</h1>
-    <p>Administration du monde, des joueurs et des serveurs.</p>
+    <p>Gestion de vos serveurs et de votre communauté Discord.</p>
     <div class="hero-actions">${link('editor','◈ ANOMALIA Éditor','primary')}${link('tools','⚒ ANOMALIA Tools','outline')}</div>
    </div>
   </div></section>
   ${noticeForLogin()}
   <section class="overview-kpis" aria-label="Indicateurs du réseau">
-   <div class="section-head compact"><div><span class="section-kicker">RÉSEAU ANOMALIA’Z</span><h2>Vue d’ensemble</h2></div><span class="overview-live ${state.status?.discordConnected?'online':'offline'}">● ${state.status?.discordConnected?'Bot Discord en ligne':'Bot Discord hors ligne'}</span></div>
+   <div class="section-head compact"><div><span class="section-kicker">BOT DISCORD MULTI-SERVEURS</span><h2>Vue d’ensemble</h2></div><span class="overview-live ${state.status?.discordConnected?'online':'offline'}">● ${state.status?.discordConnected?'Bot Discord en ligne':'Bot Discord hors ligne'}</span></div>
    <div class="grid metric-grid">
     ${metric('Statut du bot',state.status?.discordConnected?'ACTIF':'OFFLINE','Connexion Discord','status')}
     ${metric('Serveurs',memberCount,isAdmin?'Administrables':'Connexion nécessaire','servers')}
@@ -145,12 +144,12 @@ function overview(){
    <div class="command-grid">${panels}</div>
   </section>
   <section class="overview-bottom">
-   <div class="compact-panel"><div class="compact-panel-head"><h3>État des intégrations</h3><a href="#integrations">Configurer ›</a></div><div class="details-list">
-    ${infoLine('Stockage',state.status?.storage==='postgres'?'PostgreSQL':'Stockage local')}
-    ${infoLine('Authentification',state.status?.oauth?'Configuration détectée':'Non configurée')}
-    ${infoLine('Unreal Engine',state.overview?.gameConnection||'Aucune télémétrie')}
+   <div class="compact-panel"><div class="compact-panel-head"><h3>Gestion du serveur Discord</h3><a href="#settings">Paramètres ›</a></div><div class="details-list">
+    ${infoLine('Bot',state.status?.discordConnected?'Connecté':'Déconnecté')}
+    ${infoLine('Serveur sélectionné',state.session?.guilds?.find(g=>g.id===state.session?.guildId)?.name||'Connexion requise')}
+    ${infoLine('Configuration','Indépendante pour chaque serveur')}
    </div></div>
-   <div class="compact-panel"><div class="compact-panel-head"><h3>Activité du jeu</h3><span>Derniers événements</span></div><div class="activity-list">${recent}</div></div>
+   <div class="compact-panel"><div class="compact-panel-head"><h3>Activité du serveur</h3><span>Derniers événements enregistrés</span></div><div class="activity-list">${recent}</div></div>
   </section>`;
 }
 function infoLine(k,v){return `<div class="info-line"><span>${html(k)}</span><strong>${html(v)}</strong></div>`}
@@ -189,44 +188,47 @@ function formatValue(value){
 function modulePage(id){
  const fields=state.catalog.fields[id]||[];
  return heading(id)+noticeForLogin()+`<div class="card">${sectionToolbar(id)}<div style="height:16px"></div>${valuesTable(id)}</div>
- ${id==='shop'?'<div class="notice">Les achats effectués dans Discord sont ajoutés aux livraisons en attente. Ils ne génèrent aucun objet directement dans Unreal Engine sans bridge de livraison.</div>':''}
- ${id==='whitelist'?'<div class="notice">Valider une demande modifie le statut dans le Dashboard. L’admission réelle dans ANOMALIA nécessite la connexion du système de whitelist du serveur de jeu.</div>':''}
- ${id==='builds'?'<div class="notice info">Pour lancer une compilation réelle d’Unreal, utilise le dépôt GitHub du jeu et ses workflows, pas un changement de statut de cette liste.</div>':''}`;
+ ${id==='shop'?'<div class="notice">Les achats sont enregistrés dans le serveur Discord sélectionné. Toute livraison en jeu nécessite une intégration supplémentaire configurée par son administrateur.</div>':''}
+ ${id==='whitelist'?'<div class="notice">La validation met à jour la demande de ce Discord. L’accès automatique à un serveur de jeu nécessite une intégration adaptée, si vous en utilisez un.</div>':''}
+ ${id==='builds'?'<div class="notice info">Ce module suit les versions configurées pour ce serveur. Il ne lance pas de compilation à distance.</div>':''}`;
 }
 function editorPage(){
  return heading('editor')+noticeForLogin()+
- `<div class="two-col"><div class="card"><p class="section-overline">ÉDITEUR DE CONFIGURATION</p><h2>Construire l’univers</h2>
- <p>Prépare les modifications de cartes, assets, routes et bunkers. Le véritable ANOMALIA Éditor UE5 se lance sur le PC où le projet Unreal est installé, pas dans ce navigateur.</p>
+ `<div class="two-col"><div class="card"><p class="section-overline">ANOMALIA ÉDITOR</p><h2>Configuration du serveur</h2>
+ <p>Préparez et organisez les cartes, objets, zones et scénarios pour votre propre communauté Discord. Les modifications restent associées au serveur sélectionné.</p>
  <div class="details-list">
-  ${infoLine('Projet Unreal','ANOMALIA’Z PRIGIMALIA')}${infoLine('Répertoire de travail','D:\\ANOMALIA (sur ton PC)')}${infoLine('Mode','Brouillons et export JSON')}
+  ${infoLine('Serveur',state.session?.guilds?.find(g=>g.id===state.session?.guildId)?.name||'Connexion administrateur requise')}
+  ${infoLine('Mode','Configuration et export JSON')}
+  ${infoLine('Déploiement','Aucune modification automatique de jeu externe')}
  </div><div class="hero-actions">
-  <a class="button primary" target="_blank" rel="noopener noreferrer" href="${repoUrl}/blob/main/src/map-editor.js">↗ ANOMALIA Map Editor (code)</a>
-  <a class="button secondary" target="_blank" rel="noopener noreferrer" href="${repoUrl}/tree/main/unreal">↗ Projet Unreal Engine</a>
-  ${authed()?'<a class="button outline" href="/api/editor/export" download>↓ Exporter la configuration</a>':''}
+  ${authed()?'<a class="button primary" href="/api/editor/export" download>↓ Exporter la configuration</a>':''}
+  ${link('maps','Cartes et zones','secondary')}${link('assets','Bibliothèque','secondary')}
  </div></div>
- <div class="card"><p class="section-overline">MODULE D’ÉDITION</p><h2>Demandes de modifications</h2><p>Créer des tâches pour les cartes et modèles 3D, puis les exporter pour le pipeline du jeu.</p>
- <div class="hero-actions"><button class="button primary" data-create="editor" ${authed()?'':'disabled'}>＋ Nouvelle modification</button>${link('maps','Cartes et régions','secondary')}${link('assets','Bibliothèque 3D','secondary')}</div>
- <div class="notice info">L’éditeur Web ne modifie pas automatiquement les fichiers du PC ou les cartes UE5.</div></div></div>
- <div class="section-head"><h2>◈ MODIFICATIONS ENREGISTRÉES</h2></div><div class="card">${sectionToolbar('editor')}<div style="height:16px"></div>${valuesTable('editor')}</div>`;
+ <div class="card"><p class="section-overline">GESTION DES CONTENUS</p><h2>Demandes de modifications</h2><p>Conservez les paramètres et demandes de votre serveur au même endroit. Aucun projet privé ou fichier d’un autre Discord n’est accessible ici.</p>
+ <div class="hero-actions"><button class="button primary" data-create="editor" ${authed()?'':'disabled'}>＋ Nouvelle modification</button></div>
+ <div class="notice info">Ce module gère des configurations. Il n’est pas relié directement aux fichiers locaux des utilisateurs.</div></div></div>
+ <div class="section-head"><h2>MODIFICATIONS DU SERVEUR</h2></div><div class="card">${sectionToolbar('editor')}<div style="height:16px"></div>${valuesTable('editor')}</div>`;
 }
 function toolsPage(){
  return heading('tools')+noticeForLogin()+
- `<div class="two-col"><div class="card"><p class="section-overline">VALIDATION · ANOMALIA TOOLS</p><h2>Vérifier un fichier JSON</h2>
- <p>Colle une configuration et vérifie sa syntaxe sans toucher à la version du jeu.</p>
- <textarea id="jsonTool" class="input" rows="11" spellcheck="false" placeholder='{"map":"SKARVIK","lootMultiplier":2}'></textarea>
- <div class="hero-actions"><button class="button primary" data-validate ${authed()?'':'disabled'}>◈ Valider le JSON</button><a class="button secondary" target="_blank" rel="noopener noreferrer" href="${repoUrl}/tree/main/scripts">↗ Scripts ANOMALIA</a></div><pre class="terminal" id="toolResult">En attente d’un document…</pre></div>
- <div class="card"><p class="section-overline">CMD STUDIO</p><h2>Accès aux outils de production</h2>
- ${infoLine('ANOMALIA Éditor','Configuration et cartes')}${infoLine('ANOMALIA Tools','Tests, vérification JSON')}${infoLine('Dépôt du vrai jeu','GitHub ANOMALIA')}${infoLine('Imports et modèles','Gestion via le projet Unreal')}
- <div class="hero-actions">${link('editor','Ouvrir Éditor','primary')}${link('loot','Loot','secondary')}${link('builds','Builds','secondary')}</div>
- <div class="notice">Le Dashboard ne donne pas d’accès à distance à D:\\ANOMALIA tant qu’aucun agent sécurisé autorisé n’est connecté.</div>
- </div></div><div class="section-head"><h2>HISTORIQUE DES DIAGNOSTICS</h2></div><div class="card">${sectionToolbar('tools')}<div style="height:16px"></div>${valuesTable('tools')}</div>`;
+ `<div class="two-col"><div class="card"><p class="section-overline">ANOMALIA TOOLS</p><h2>Vérifier un fichier JSON</h2>
+ <p>Contrôlez la syntaxe de vos configurations sans modifier les données du serveur.</p>
+ <textarea id="jsonTool" class="input" rows="11" spellcheck="false" placeholder='{"module":"whitelist","enabled":true}'></textarea>
+ <div class="hero-actions"><button class="button primary" data-validate ${authed()?'':'disabled'}>◈ Valider le JSON</button></div>
+ <pre class="terminal" id="toolResult">En attente d’un document…</pre></div>
+ <div class="card"><p class="section-overline">OUTILS DU SERVEUR</p><h2>Gestion & diagnostics</h2>
+ ${infoLine('ANOMALIA Éditor','Paramètres du serveur Discord')}
+ ${infoLine('ANOMALIA Tools','Validation et suivi des configurations')}
+ ${infoLine('Données','Séparées par communauté')}
+ <div class="hero-actions">${link('editor','Ouvrir Éditor','primary')}${link('loot','Gestion du loot','secondary')}${link('logs','Journal','secondary')}</div>
+ </div></div><div class="section-head"><h2>DIAGNOSTICS DU SERVEUR</h2></div><div class="card">${sectionToolbar('tools')}<div style="height:16px"></div>${valuesTable('tools')}</div>`;
 }
 function bunkersPage(){
  const rows=state.game?.bunkers||[],labels={key:'🔑 Clé',card:'💳 Carte perforée',morse:'📡 Morse'};
  return heading('bunkers')+noticeForLogin()+
- `<div class="grid metric-grid">${metric('Bunkers prévus',rows.length,'Catalogue du prototype','bunkers')}${metric('À clé',rows.filter(x=>x.access==='key').length,'Clés cachées dans le monde','whitelist')}${metric('À carte',rows.filter(x=>x.access==='card').length,'Cartes perforées de niveau','assets')}${metric('Radio Morse',rows.filter(x=>x.access==='morse').length,'Codes tournants nocturnes','radio')}</div>
- <div class="notice info">Ces coordonnées décrivent le prototype ANOMALIA. Elles ne sont pas une lecture en direct des cartes UE5. Les bâtiments comprennent aussi des zones civiles, industrielles et médicales.</div>
- <div class="card"><h2>⬡ Réseau de bunkers ANOMALIA</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Site</th><th>Bâtiment</th><th>Accès</th><th>Grille</th><th>Coordonnées</th></tr></thead><tbody>
+ `<div class="grid metric-grid">${metric('Bunkers exemples',rows.length,'Données de démonstration','bunkers')}${metric('À clé',rows.filter(x=>x.access==='key').length,'Clés cachées dans le monde','whitelist')}${metric('À carte',rows.filter(x=>x.access==='card').length,'Cartes perforées de niveau','assets')}${metric('Radio Morse',rows.filter(x=>x.access==='morse').length,'Codes tournants nocturnes','radio')}</div>
+ <div class="notice info">Ce catalogue est une démonstration du module. Il ne décrit pas automatiquement les bunkers de votre serveur. Vous pouvez enregistrer vos propres emplacements ci-dessous.</div>
+ <div class="card"><h2>⬡ Catalogue de bunkers d’exemple</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>Site</th><th>Bâtiment</th><th>Accès</th><th>Grille</th><th>Coordonnées</th></tr></thead><tbody>
  ${rows.map(b=>`<tr><td>${html(b.name)}</td><td>${html(b.building)}</td><td><span class="pill">${labels[b.access]}</span></td><td>${html(b.grid)}</td><td>${html(b.x)} / ${html(b.z)}</td></tr>`).join('')}</tbody></table></div></div>
  <div class="section-head"><h2>BUNKERS PERSONNALISÉS</h2><span>Administration RP et scénarios</span></div><div class="card">${sectionToolbar('bunkers')}<div style="height:16px"></div>${valuesTable('bunkers')}</div>`;
 }
@@ -237,7 +239,7 @@ function radioPage(){
  <textarea id="morseSignal" class="input" rows="4" spellcheck="false" placeholder=".---- ----- ----- .---- ..--- .---- ----- ....- ---.. .----"></textarea>
  <div class="hero-actions"><button class="button primary" data-decode>⌁ Décoder le signal</button><button class="button secondary" data-sample-morse>Essai : Morse d’entraînement</button></div>
  <pre class="radio-morse" id="morseResult">- - - / . . .</pre>
- <div class="notice">Un décodeur manuel n’est pas un récepteur audio du serveur. Les codes ne seront réels qu’après émission du jeu par un bridge/récepteur connecté.</div></div>
+ <div class="notice">Ce décodeur est manuel et utilise des données d’exemple. Il n’écoute pas les transmissions de votre serveur.</div></div>
  <div class="card"><p class="section-overline">ANTENNES ET RELAIS</p><h2>Réseau de transmissions</h2>
  ${(state.game?.antennas||[]).map(a=>infoLine(a.name,'X '+a.x+' · Z '+a.z)).join('')}
  </div></div><div class="section-head"><h2>TRANSMISSIONS CONFIGURÉES</h2></div><div class="card">${sectionToolbar('radio')}<div style="height:16px"></div>${valuesTable('radio')}</div>`;
@@ -245,28 +247,36 @@ function radioPage(){
 function settingsPage(){
  const cfg=state.overview?.settings||{};
  const inputs=[['name','Nom du serveur'],['accent','Couleur hexadécimale'],['whitelistRoleId','Rôle whitelist (ID Discord)'],['announcementChannelId','Salon annonces (ID Discord)'],['logsChannelId','Salon logs (ID Discord)'],['welcomeChannelId','Salon bienvenue (ID Discord)']];
- return heading('settings')+noticeForLogin()+`<div class="two-col"><div class="card"><h2>⚙ Personnalisation Discord</h2><form id="settingsForm" class="form-fields">
+ return heading('settings')+noticeForLogin()+`<div class="two-col"><div class="card"><h2>⚙ Paramètres du Discord</h2><form id="settingsForm" class="form-fields">
  ${inputs.map(([key,label])=>`<div class="field"><label for="settings-${key}">${label}</label><input id="settings-${key}" name="${key}" value="${html(cfg[key]||'')}" ${authed()?'':'disabled'}></div>`).join('')}
  <div class="field full"><button class="button primary" type="submit" ${authed()?'':'disabled'}>Enregistrer les réglages</button></div></form></div>
- <div class="card"><h2>🔒 Sécurité et liaison</h2>
- ${infoLine('Authentification',state.status?.oauth?'Discord OAuth2':'Non configurée')}
- ${infoLine('Stockage',state.status?.storage||'inconnu')}
- ${infoLine('Bot Discord',state.status?.discordConnected?'Connecté':'Déconnecté')}
- ${infoLine('Bridge du vrai jeu',state.status?.gameBridgeConfigured?'Prêt à recevoir des événements':'Non configuré')}
- <div class="notice">Les jetons privés (Discord, OAuth, bridge) se définissent dans Railway. Ils ne s’enregistrent jamais dans cette page.</div>
+ <div class="card"><h2>🔒 Sécurité des serveurs</h2>
+ ${infoLine('Bot Discord',state.status?.discordConnected?'En ligne':'Hors ligne')}
+ ${infoLine('Accès',authed()?'Administrateur du serveur sélectionné':'Connexion Discord requise')}
+ ${infoLine('Données','Isolées entre les serveurs')}
+ <p>Chaque administrateur gère uniquement les données des serveurs Discord pour lesquels il dispose des autorisations nécessaires.</p>
+ <div class="notice info">La configuration technique du bot est réservée à son hébergeur et n’est pas partagée dans les paramètres des autres communautés.</div>
  </div></div>`;
 }
 function integrationsPage(){
+ const guildName=state.session?.guilds?.find(g=>g.id===state.session?.guildId)?.name;
  return heading('integrations')+noticeForLogin()+`<div class="two-col">
- <div class="card"><h2>⚡ Jeu Unreal Engine 5</h2>
- ${infoLine('Code du projet',repoUrl)}${infoLine('État du bridge',state.status?.gameBridgeConfigured?'Jeton configuré':'Aucun jeton GAME_BRIDGE_SECRET')}
- ${infoLine('Dernière télémétrie',state.overview?.gameConnection||'Aucune')}
- <p>Pour synchroniser joueurs, cartes, inventaires et événements, il faut un composant serveur UE5 qui émette des événements signés. Les modules du Dashboard fonctionnent actuellement comme des configurations administratives.</p>
- <a href="${repoUrl}" target="_blank" rel="noopener noreferrer" class="button primary">↗ Ouvrir le jeu sur GitHub</a></div>
- <div class="card"><h2>📡 Discord & services</h2>
- ${infoLine('Bot',state.status?.discordConnected?'En ligne':'Hors ligne')}${infoLine('Dashboard','Cette application')}${infoLine('Comptes liés',state.session?.guilds?.length||0)}
- <p>Le bot et le Dashboard utilisent les mêmes collections propres à chaque Discord. Le stockage PostgreSQL est recommandé pour conserver les achats, whitelist et joueurs après les redéploiements Railway.</p>
- </div></div><div class="section-head"><h2>CONNECTEURS PERSONNALISÉS</h2></div><div class="card">${sectionToolbar('integrations')}<div style="height:16px"></div>${valuesTable('integrations')}</div>`;
+ <div class="card"><h2>◈ Connexion Discord</h2>
+ ${infoLine('Bot',state.status?.discordConnected?'En ligne':'Hors ligne')}
+ ${infoLine('Serveur administré',guildName||'Connectez-vous avec Discord')}
+ ${infoLine('Permissions',authed()?'Accès administrateur confirmé':'Connexion requise')}
+ <p>Les modules sont configurés indépendamment pour chaque Discord. Sélectionnez votre serveur dans le menu latéral pour gérer ses paramètres, sa communauté et ses événements.</p>
+ <div class="hero-actions">${link('settings','Paramètres Discord','primary')}${link('servers','Serveurs','secondary')}</div>
+ </div>
+ <div class="card"><h2>▣ Services de votre communauté</h2>
+ ${infoLine('Whitelist','Demandes et validations')}
+ ${infoLine('Boutique','Articles et commandes')}
+ ${infoLine('Pass de combat','Paliers et récompenses')}
+ ${infoLine('Modération','Paramètres et suivi Discord')}
+ <p>Ces modules enregistrent des configurations et actions pour le serveur sélectionné. Les connexions à des jeux ou services externes ne sont pas automatiques.</p>
+ <div class="hero-actions">${link('whitelist','Whitelist','secondary')}${link('shop','Boutique','secondary')}${link('moderation','Modération','secondary')}</div>
+ </div></div>
+ <div class="section-head"><h2>CONFIGURATIONS PERSONNALISÉES</h2><span>Propres à votre serveur Discord</span></div><div class="card">${sectionToolbar('integrations')}<div style="height:16px"></div>${valuesTable('integrations')}</div>`;
 }
 function render(){
  if(!state.catalog)return;
