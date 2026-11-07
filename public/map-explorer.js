@@ -20,7 +20,7 @@ export async function mountMapExplorer(root,fetcher){
  let pointerState=new Map(),pinchDistance=0,pinchScale=1,pinchWorld=null,dragged=false;
  let destroyed=false,resizeObserver=null;
  const setDetail=message=>{detail.textContent=message};
- const camera=()=>{scene.style.transform='translate('+tx+'px,'+ty+'px) scale('+scale+')';$ (root,'#atlasZoomValue').textContent=Math.round(scale/Math.max(fit,0.01)*100)+' %'};
+ const camera=()=>{scene.style.transform='translate('+tx+'px,'+ty+'px) scale('+scale+')';scene.style.setProperty('--atlas-marker-inverse',String(1/scale));$ (root,'#atlasZoomValue').textContent=Math.round(scale/Math.max(fit,0.01)*100)+' %'};
  const limits=()=>{
   const w=viewer.clientWidth,h=viewer.clientHeight,s=WORLD*scale;
   const margin=Math.min(140,Math.min(w,h)*.28);
