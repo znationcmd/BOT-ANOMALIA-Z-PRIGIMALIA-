@@ -8,11 +8,11 @@ import {BASE_MAPS,buildMapExplorer,safeImageUrl,safeTierZones} from '../lib/map-
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>readFile(path.join(root,file),'utf8');
 
-test('catalog contains only the eighteen ANOMALIA’Z PRIGIMALIA maps',()=>{
+test('catalog contains only the nineteen ANOMALIA’Z PRIGIMALIA maps',()=>{
  const original=['SKARVIK','DRAZOVIA','KARSKOV','VORGRAD','NEMORIS','DRAKHEIM','SOLYNACALYRA',
  'NEXAVARKHOS','CHERNASKALUXRIA','F.A.L.C','KOLCHIEM ORIGINS'];
- const added=['ROSКАТVIA-B1','НОГОКВ-51','PARADISIOMANIA','DEADROOT','YUDINAVIA','MOSCOVIE','CORSIVIA'];
- assert.equal(BASE_MAPS.length,18);
+ const added=['ROSКАТVIA-B1','НОГОКВ-51','PARADISIOMANIA','DEADROOT','YUDINAVIA','MOSCOVIE','CORSIVIA','БОТ СЕВЕР'];
+ assert.equal(BASE_MAPS.length,19);
  assert.deepEqual(new Set(BASE_MAPS.map(m=>m.name)),new Set([...original,...added]));
  assert.ok(BASE_MAPS.every(m=>m.family.startsWith('ANOMALIA’Z')&&m.imageUrl===null&&m.width===null));
  for(const foreign of ['Chernarus+','Livonia','Sakhal','Deer Isle','Namalsk'])assert.ok(!BASE_MAPS.some(m=>m.name===foreign));
@@ -49,7 +49,7 @@ test('reject external game maps, invalid image URLs and impossible coordinates',
         {name:'Sans coordonnées',map:'DRAZOVIA'},
         {name:'Autre jeu',map:'Chernarus+',x:20,z:20}]
  });
- assert.equal(out.maps.length,18);
+ assert.equal(out.maps.length,19);
  assert.ok(!out.maps.some(m=>m.name==='Chernarus+'));
  assert.equal(out.features.length,0);
 });
@@ -91,4 +91,17 @@ test('new worlds accept scoped data without inventing map images or spawn points
   assert.equal(out.features.length,1);assert.equal(out.features[0].mapId,m.id);
  }
  assert.deepEqual(buildMapExplorer().features,[]);
+});
+
+test('regional scripts and area shares remain authored labels, never fabricated spawns',()=>{
+ const out=buildMapExplorer();assert.equal(out.features.length,0);
+ const north=out.maps.find(m=>m.id==='bot-sever');assert.equal(north.size,'50 × 50 km');
+ const regions=north.localityNaming.regions;assert.equal(regions[0].areaFraction,.15);
+ assert.equal((regions[0].northMetres-regions[0].southMetres)*(regions[0].eastMetres-regions[0].westMetres),375000000);
+ assert.equal(regions[0].northMetres,regions[1].southMetres);
+ assert.ok(north.localityNaming.cityNames.ka.every(n=>/\p{Script=Georgian}/u.test(n)));
+ assert.ok(north.localityNaming.cityNames.ru.every(n=>/\p{Script=Cyrillic}/u.test(n)));
+ assert.equal(out.maps.find(m=>m.id==='vorgrad').localityNaming.direction,'rtl');
+ assert.ok(out.maps.find(m=>m.id==='vorgrad').localityNaming.cityNames.every(n=>/\p{Script=Arabic}/u.test(n)));
+ assert.equal(out.maps.find(m=>m.id==='corsivia').localityNaming.language,'co');
 });

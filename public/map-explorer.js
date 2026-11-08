@@ -48,7 +48,7 @@ export async function mountMapExplorer(root,fetcher){
  function renderCatalog(){
   const q=normalize(catalogSearch.value),group=family.value;
   const visible=maps.filter(m=>(group==='all'||m.family===group)&&(normalize(m.name).includes(q)||normalize(m.family).includes(q)));
-  catalog.innerHTML=visible.length?visible.map(m=>'<button type="button" class="atlas-map-card '+(active?.id===m.id?'selected':'')+'" data-atlas-map="'+esc(m.id)+'" aria-pressed="'+String(active?.id===m.id)+'"><span class="atlas-map-thumb" aria-hidden="true">'+(m.configured?'▧':'◇')+'</span><span class="atlas-map-meta"><strong>'+esc(m.name)+'</strong><small>'+esc(m.family)+'</small></span><span class="atlas-map-state">'+(m.configured?'Fond ✓':'À compléter')+'</span></button>').join(''):'<p class="atlas-empty">Aucune carte ne correspond à la recherche.</p>';
+  catalog.innerHTML=visible.length?visible.map(m=>'<button type="button" class="atlas-map-card '+(active?.id===m.id?'selected':'')+'" data-atlas-map="'+esc(m.id)+'" aria-pressed="'+String(active?.id===m.id)+'"><span class="atlas-map-thumb" aria-hidden="true">'+(m.configured?'▧':'◇')+'</span><span class="atlas-map-meta"><strong dir="auto">'+esc(m.name)+'</strong><small>'+esc(m.family)+'</small></span><span class="atlas-map-state">'+(m.configured?'Fond ✓':'À compléter')+'</span></button>').join(''):'<p class="atlas-empty">Aucune carte ne correspond à la recherche.</p>';
  }
  function filtered(){
   if(!active)return[];
@@ -92,7 +92,7 @@ export async function mountMapExplorer(root,fetcher){
    const allForMap=features.some(f=>f.mapId===active.id);
    results.innerHTML='<p class="atlas-empty">'+(allForMap?'Aucun emplacement ne correspond à ces filtres.':'Aucun emplacement vérifié sur cette carte. Les administrateurs peuvent ajouter les objets, véhicules et lieux avec leurs coordonnées.')+'</p>';
   }else{
-   results.innerHTML=capped.map((f,i)=>'<button class="atlas-result" data-atlas-feature="'+i+'" type="button"><span class="atlas-result-symbol">'+({item:'◫',vehicle:'▰',location:'⌖'}[f.category]||'•')+'</span><span><strong>'+esc(f.name)+'</strong><small>'+esc(label(f.category))+(f.tier?' · Tier '+esc(f.tier):'')+' · X '+esc(f.x)+' / Z '+esc(f.z)+'</small></span></button>').join('')+(rows.length>900?'<p class="atlas-empty">Affichage limité aux 900 premiers résultats. Affine la recherche.</p>':'');
+   results.innerHTML=capped.map((f,i)=>'<button class="atlas-result" data-atlas-feature="'+i+'" type="button"><span class="atlas-result-symbol">'+({item:'◫',vehicle:'▰',location:'⌖'}[f.category]||'•')+'</span><span><strong dir="auto">'+esc(f.name)+'</strong><small>'+esc(label(f.category))+(f.tier?' · Tier '+esc(f.tier):'')+' · X '+esc(f.x)+' / Z '+esc(f.z)+'</small></span></button>').join('')+(rows.length>900?'<p class="atlas-empty">Affichage limité aux 900 premiers résultats. Affine la recherche.</p>':'');
   }
   drawZones();
   // Expose only current results for marker click handlers.
@@ -118,7 +118,10 @@ export async function mountMapExplorer(root,fetcher){
    message.innerHTML='<strong>Fond cartographique non configuré</strong><span>La grille permet de tester le zoom. Une image géoréférencée et des coordonnées validées sont nécessaires pour afficher la carte réelle.</span>';
    base.appendChild(message);
   }
-  setDetail('Pince avec deux doigts ou utilise la molette pour zoomer. Glisse pour déplacer la carte.');
+  const naming=active.localityNaming;
+  const names=naming?(Array.isArray(naming.cityNames)?naming.cityNames:Object.values(naming.cityNames||{}).flat()):[];
+  detail.setAttribute('dir','auto');
+  setDetail(names.length?'Noms de villes prévus (implantation non vérifiée) : '+names.join(' · '):'Pince avec deux doigts ou utilise la molette pour zoomer. Glisse pour déplacer la carte.');
   renderCatalog();drawFeatures();
   requestAnimationFrame(()=>{if(!destroyed&&active?.id===id)reset();if(scroll&&window.matchMedia('(max-width:760px)').matches)viewer.scrollIntoView({behavior:'smooth',block:'start'})});
  }
