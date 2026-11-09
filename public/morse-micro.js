@@ -15,7 +15,7 @@ export function decodePulseSequence(pulses){
  }
  if(current)groups.push(current);
  const digits=groups.map(g=>codeByPattern[g]??'?').join('');
- return {digits,groups,complete:/^\\d{10}$/.test(digits),dotMs:Math.round(dot)};
+ return {digits,groups,complete:/^\d{10}$/.test(digits),dotMs:Math.round(dot)};
 }
 export class MicroMorseRecorder{
  constructor(onUpdate){this.onUpdate=onUpdate;this.stream=null;this.ctx=null;this.running=false;this.pulses=[];}
