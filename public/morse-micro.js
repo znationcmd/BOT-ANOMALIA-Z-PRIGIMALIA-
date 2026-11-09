@@ -28,23 +28,36 @@ export class MicroMorseRecorder{
    if(!AudioContextClass)throw new Error('Web Audio non pris en charge.');
    this.ctx=new AudioContextClass();await this.ctx.resume();
    const source=this.ctx.createMediaStreamSource(this.stream);
-   this.analyser=this.ctx.createAnalyser();this.analyser.fftSize=2048;
+   this.analyser=this.ctx.createAnalyser();this.analyser.fftSize=4096;
    source.connect(this.analyser);
    this.samples=new Float32Array(this.analyser.fftSize);
+   this.spectrum=new Uint8Array(this.analyser.frequencyBinCount);
+   this.frequencyHz=0;this.signalFrames=0;
    this.running=true;this.last=performance.now();this.level=false;this.duration=0;this.noise=0.004;this.peak=0;
    this.frame=()=>{if(!this.running)return;
     this.analyser.getFloatTimeDomainData(this.samples);
     let power=0;for(let i=0;i<this.samples.length;i++)power+=this.samples[i]*this.samples[i];
     const rms=Math.sqrt(power/this.samples.length);
-    if(!this.level)this.noise=this.noise*.985+Math.min(rms,this.noise*2)*.015;
-    this.peak=Math.max(rms,this.peak*.97);
-    const threshold=Math.max(.012,this.noise*2.5,this.peak*.25);
-    const active=rms>threshold;
+    // Detect a narrowband Morse tone; don't confuse speech with a beep.
+    this.analyser.getByteFrequencyData(this.spectrum);
+    const hzPerBin=this.ctx.sampleRate/this.analyser.fftSize;
+    const low=Math.max(1,Math.ceil(380/hzPerBin));
+    const high=Math.min(this.spectrum.length-2,Math.floor(1700/hzPerBin));
+    let peak=0,peakIndex=low,total=0,count=0;
+    for(let i=low;i<=high;i++){
+     const value=this.spectrum[i];total+=value;count++;
+     if(value>peak){peak=value;peakIndex=i}
+    }
+    const background=count?total/count:0;
+    const active=rms>.0035&&peak>105&&peak/(background+1)>2.6;
+    if(active){this.frequencyHz=Math.round(peakIndex*hzPerBin);this.signalFrames++}
+    if(!this.level)this.noise=this.noise*.98+Math.min(rms,this.noise*2)*.02;
+    this.peak=Math.max(rms,this.peak*.98);
     const now=performance.now(),dt=Math.min(now-this.last,100);this.last=now;
     if(active===this.level)this.duration+=dt;
     else {if(this.duration>=35)this.pulses.push({on:this.level,ms:this.duration});this.level=active;this.duration=dt;}
     if(this.pulses.length>400)this.pulses.shift();
-    if(this.onUpdate)this.onUpdate({rms,seconds:Math.round((now-this.startedAt)/1000),pulses:this.pulses.length});
+    if(this.onUpdate)this.onUpdate({rms,seconds:Math.round((now-this.startedAt)/1000),pulses:this.pulses.length,frequencyHz:this.frequencyHz,detected:this.signalFrames>2});
     this.raf=requestAnimationFrame(this.frame);
    };
    this.startedAt=performance.now();this.raf=requestAnimationFrame(this.frame);
