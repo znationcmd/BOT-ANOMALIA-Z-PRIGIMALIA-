@@ -1,4 +1,6 @@
 import {mountMapExplorer} from './map-explorer.js';
+import {MicroMorseRecorder,decodePulseSequence} from './morse-micro.js';
+let morseRecorder=null;
 const state={
  catalog:null,session:null,status:null,game:null,overview:null,records:[],module:'overview',
  search:'',filter:'',loading:false,guildServers:null,guildError:null
@@ -266,12 +268,13 @@ function bunkersPage(){
 }
 function radioPage(){
  return heading('radio')+noticeForLogin()+
- `<div class="two-col"><div class="card"><p class="section-overline">CANAL 80.0 MHz · CODE DES ANTENNES</p><h2>Décodeur Morse</h2>
- <p>Saisis dix chiffres ou dix groupes Morse séparés par des espaces. Le bot traduit la grille du bunker et le code entendu.</p>
+ `<div class="two-col"><div class="card"><p class="section-overline">RADIO ANOMALIA’Z · 107,0 MHz · CODE DES BUNKERS</p><h2>Décodeur Morse</h2>
+ <p>Clique sur « Décoder au micro » pour autoriser l’écoute du signal émis par ta radio ANOMALIA’Z réglée sur 107,0 MHz, puis reclique pour arrêter et décoder. Tu peux aussi saisir les 10 chiffres ou groupes Morse.</p>
  <textarea id="morseSignal" class="input" rows="4" spellcheck="false" placeholder=".---- ----- ----- .---- ..--- .---- ----- ....- ---.. .----"></textarea>
- <div class="hero-actions"><button class="button primary" data-decode>⌁ Décoder le signal</button><button class="button secondary" data-sample-morse>Essai : Morse d’entraînement</button></div>
+ <div class="hero-actions"><button class="button primary" type="button" data-decode>🎙️ Décoder au micro</button><button class="button secondary" type="button" data-decode-manual>⌁ Décoder le texte</button><button class="button secondary" type="button" data-sample-morse>Essai Morse</button></div>
+ <p id="morseMicStatus" role="status" aria-live="polite">Micro arrêté · Autorisation demandée uniquement au clic · Aucun son envoyé au serveur.</p>
  <pre class="radio-morse" id="morseResult">- - - / . . .</pre>
- <div class="notice">Ce décodeur est manuel et utilise des données d’exemple. Il n’écoute pas les transmissions de votre serveur.</div></div>
+ <div class="notice">Le microphone écoute uniquement le son autour de ton appareil (pas les ondes 107 MHz directement). Détection expérimentale ; les codes actifs ne seront validés qu’une fois le jeu connecté.</div></div>
  <div class="card"><p class="section-overline">ANTENNES ET RELAIS</p><h2>Réseau de transmissions</h2>
  ${(state.game?.antennas||[]).map(a=>infoLine(a.name,'X '+a.x+' · Z '+a.z)).join('')}
  </div></div><div class="section-head"><h2>TRANSMISSIONS CONFIGURÉES</h2></div><div class="card">${sectionToolbar('radio')}<div style="height:16px"></div>${valuesTable('radio')}</div>`;
@@ -325,6 +328,7 @@ function render(){
  else if(id==='settings')page=settingsPage();
  else if(id==='integrations')page=integrationsPage();
  else page=modulePage(id);
+ if(morseRecorder?.running){morseRecorder.stop();morseRecorder=null;}
  $('#mapsExplorer')?._atlasCleanup?.();
  $('#main').innerHTML=page;
  if(id==='maps')mountMapExplorer($('#mapsExplorer'),api);
@@ -383,6 +387,25 @@ async function approve(id){
  const r=state.records.find(x=>x.id===id);if(!r)return;
  try{await api('/api/modules/whitelist/'+id,{method:'PATCH',body:{status:'approved'}});toast('Whitelist approuvée dans le Dashboard — pas encore transmise au jeu.');await loadRecords('whitelist');render()}catch(e){toast(e.message)}
 }
+async function toggleMorseMic(){
+ const status=$('#morseMicStatus'),button=document.querySelector('[data-decode]');
+ if(morseRecorder?.running){
+  const pulses=morseRecorder.stop();morseRecorder=null;
+  button.textContent='🎙️ Décoder au micro';
+  try{
+   const result=decodePulseSequence(pulses);
+   $('#morseSignal').value=result.groups.join(' ');
+   status.textContent='Enregistrement terminé · '+result.groups.length+' groupes · point ≈ '+result.dotMs+' ms';
+   if(result.complete)await decodeSignal();
+   else $('#morseResult').textContent='Transmission partielle : '+result.digits+'\nRéessaie dans un environnement calme ou saisis le signal à la main.';
+  }catch(e){status.textContent='Micro arrêté';$('#morseResult').textContent=e.message}
+  return;
+ }
+ status.textContent='Demande d’autorisation du microphone…';
+ const recorder=new MicroMorseRecorder(({rms,seconds,pulses})=>{if(status?.isConnected)status.textContent='Écoute en cours · '+seconds+' s · '+pulses+' impulsions · signal '+Math.round(rms*1000);});
+ try{await recorder.start();morseRecorder=recorder;button.textContent='■ Arrêter et décoder';status.textContent='Micro actif : approche le haut-parleur de la radio à 107,0 MHz.'}
+ catch(e){recorder.stop();morseRecorder=null;status.textContent=e.name==='NotAllowedError'?'Micro refusé : autorise-le dans les réglages du navigateur.':e.message;}
+}
 async function decodeSignal(){
  const raw=$('#morseSignal')?.value||'';
  try{
@@ -425,7 +448,8 @@ function bind(){
   if(el.dataset.edit){openModal(state.module,state.records.find(r=>r.id===el.dataset.edit));return}
   if(el.dataset.delete){await deleteRow(el.dataset.delete);return}
   if(el.dataset.approve){await approve(el.dataset.approve);return}
-  if('decode' in el.dataset){await decodeSignal();return}
+  if('decode' in el.dataset){await toggleMorseMic();return}
+  if('decodeManual' in el.dataset){await decodeSignal();return}
   if('sampleMorse' in el.dataset){
    $('#morseSignal').value='.---- ----- ----- .---- ..--- .---- ----- ....- ---.. .----';
    await decodeSignal();return;

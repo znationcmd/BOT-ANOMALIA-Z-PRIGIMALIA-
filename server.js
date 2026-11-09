@@ -79,7 +79,7 @@ app.get('/api/maps/explorer',controller(async(req,res)=>{
  res.json(buildMapExplorer({guildMaps:modules.maps||[],locations:modules.locations||[],loot:modules.loot||[],vehicles:modules.vehicles||[]}));
 }));
 app.get('/api/catalog',(req,res)=>res.json({groups:GROUPS,modules:MODULES,fields:FIELDS}));
-app.get('/api/game-data',(req,res)=>res.json({bunkers:BUNKERS,antennas:ANTENNAS,source:'sample-data-not-guild-specific',live:false,frequencyMHz:80}));
+app.get('/api/game-data',(req,res)=>res.json({bunkers:BUNKERS,antennas:ANTENNAS,source:'sample-data-not-guild-specific',live:false,frequencyMHz:107}));
 app.post('/api/morse/decode',controller(async(req,res)=>{
  const value=String(req.body?.signal||'');
  if(value.length>350)return res.status(400).json({error:'Signal trop long.'});

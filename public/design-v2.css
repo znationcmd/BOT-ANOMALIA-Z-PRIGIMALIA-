@@ -285,3 +285,10 @@ body{background:#08090a;color:#f6f1e8;overflow-x:clip}
 .nav-group-items{padding:0 5px 8px}
 .nav-group-items .nav-link{padding:8px 10px;min-height:37px;font-size:11px}
 .nav-group-items .nav-link.active{box-shadow:inset 3px 0 0 #ffb849}
+
+/* Radio Morse panel: prevent long transmissions from escaping the phone viewport. */
+#main .radio-morse,#morseResult {box-sizing:border-box;max-width:100%;width:100%;overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font-size:clamp(.8rem,3.5vw,1.12rem);line-height:1.5;}
+#main #morseSignal {box-sizing:border-box;max-width:100%;width:100%;overflow-wrap:anywhere;}
+#main .hero-actions:has([data-decode]) {display:flex;flex-wrap:wrap;gap:.65rem;}
+#main .hero-actions [data-decode],#main .hero-actions [data-decode-manual],#main .hero-actions [data-sample-morse] {max-width:100%;white-space:normal;min-height:44px;}
+@media(max-width:640px){#main .hero-actions:has([data-decode])>.button{flex:1 1 100%;}#morseMicStatus{overflow-wrap:anywhere;}}
