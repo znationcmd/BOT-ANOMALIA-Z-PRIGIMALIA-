@@ -269,12 +269,12 @@ function bunkersPage(){
 function radioPage(){
  return heading('radio')+noticeForLogin()+
  `<div class="two-col"><div class="card"><p class="section-overline">RADIO ANOMALIA’Z · 107,0 MHz · CODE DES BUNKERS</p><h2>Décodeur Morse</h2>
- <p>Clique sur « Décoder au micro » pour autoriser l’écoute du signal émis par ta radio ANOMALIA’Z réglée sur 107,0 MHz, puis reclique pour arrêter et décoder. Tu peux aussi saisir les 10 chiffres ou groupes Morse.</p>
+ <p>Clique sur « Décoder au micro » et autorise le micro. Fais jouer le Morse par une radio ou un autre appareil à proximité, puis reclique pour arrêter et décoder. Sans transmission audible, aucun code ne peut être trouvé. Tu peux aussi saisir les 10 chiffres ou groupes Morse.</p>
  <textarea id="morseSignal" class="input" rows="4" spellcheck="false" placeholder=".---- ----- ----- .---- ..--- .---- ----- ....- ---.. .----"></textarea>
  <div class="hero-actions"><button class="button primary" type="button" data-decode>🎙️ Décoder au micro</button><button class="button secondary" type="button" data-decode-manual>⌁ Décoder le texte</button><button class="button secondary" type="button" data-sample-morse>Essai Morse</button></div>
  <p id="morseMicStatus" role="status" aria-live="polite">Micro arrêté · Autorisation demandée uniquement au clic · Aucun son envoyé au serveur.</p>
  <pre class="radio-morse" id="morseResult">- - - / . . .</pre>
- <div class="notice">Le microphone écoute uniquement le son autour de ton appareil (pas les ondes 107 MHz directement). Détection expérimentale ; les codes actifs ne seront validés qu’une fois le jeu connecté.</div></div>
+ <div class="notice">Le microphone écoute uniquement le son autour de ton appareil (pas les ondes 107 MHz directement). Le micro doit entendre les bips depuis un haut-parleur externe. La fréquence 107,0 MHz appartient à la radio virtuelle du jeu ; les codes réels ne sont pas encore synchronisés avec UE5.</div></div>
  <div class="card"><p class="section-overline">ANTENNES ET RELAIS</p><h2>Réseau de transmissions</h2>
  ${(state.game?.antennas||[]).map(a=>infoLine(a.name,'X '+a.x+' · Z '+a.z)).join('')}
  </div></div><div class="section-head"><h2>TRANSMISSIONS CONFIGURÉES</h2></div><div class="card">${sectionToolbar('radio')}<div style="height:16px"></div>${valuesTable('radio')}</div>`;
@@ -402,7 +402,7 @@ async function toggleMorseMic(){
   return;
  }
  status.textContent='Demande d’autorisation du microphone…';
- const recorder=new MicroMorseRecorder(({rms,seconds,pulses})=>{if(status?.isConnected)status.textContent='Écoute en cours · '+seconds+' s · '+pulses+' impulsions · signal '+Math.round(rms*1000);});
+ const recorder=new MicroMorseRecorder(({seconds,pulses,frequencyHz,detected})=>{if(status?.isConnected)status.textContent='Micro actif · '+seconds+' s · '+pulses+' impulsions · '+(detected?'Bips détectés vers '+frequencyHz+' Hz':'Aucun bip détecté : rapproche la radio et monte son volume');});
  try{await recorder.start();morseRecorder=recorder;button.textContent='■ Arrêter et décoder';status.textContent='Micro actif : approche le haut-parleur de la radio à 107,0 MHz.'}
  catch(e){recorder.stop();morseRecorder=null;status.textContent=e.name==='NotAllowedError'?'Micro refusé : autorise-le dans les réglages du navigateur.':e.message;}
 }
