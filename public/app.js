@@ -397,7 +397,7 @@ async function toggleMorseMic(){
    $('#morseSignal').value=result.groups.join(' ');
    status.textContent='Enregistrement terminé · '+result.groups.length+' groupes · point ≈ '+result.dotMs+' ms';
    if(result.complete)await decodeSignal();
-   else $('#morseResult').textContent='Transmission partielle : '+result.digits+'\\nRéessaie dans un environnement calme ou saisis le signal à la main.';
+   else $('#morseResult').textContent='Transmission partielle : '+result.digits+'\nRéessaie dans un environnement calme ou saisis le signal à la main.';
   }catch(e){status.textContent='Micro arrêté';$('#morseResult').textContent=e.message}
   return;
  }
