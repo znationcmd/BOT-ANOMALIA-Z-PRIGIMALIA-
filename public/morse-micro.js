@@ -5,8 +5,9 @@ export function decodePulseSequence(pulses){
  const on=pulses.filter(p=>p.on&&p.ms>=35).map(p=>p.ms).sort((a,b)=>a-b);
  if(on.length<5)throw new Error('Pas assez de signaux détectés. Approche le micro de la radio.');
  // The shorter half of tones estimates the Morse dot; reject silence spikes.
- const short=on.slice(0,Math.max(1,Math.ceil(on.length/2)));
- const dot=short[Math.floor(short.length/2)];
+ const minTone=on[Math.max(0,Math.floor(on.length*.08))];
+ const maxTone=on[Math.max(0,Math.floor(on.length*.9))];
+ const dot=maxTone>minTone*1.75?minTone:maxTone/3;
  const groups=[];let current='';
  for(const p of pulses){
   if(p.ms<35)continue;
