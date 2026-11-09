@@ -51,8 +51,8 @@ app.get('/api/status',controller(async(req,res)=>{
   time:new Date().toISOString()});
 }));
 // Only reveal installed Discord guild names to members who administer those guilds.
-app.get('/api/discord/servers',(req,res)=>{
- const userSession=session(req);
+app.get('/api/discord/servers',controller(async(req,res)=>{
+ const userSession=await session(req);
  if(!userSession)return res.status(401).json({error:'Connexion Discord requise.'});
  const client=state.discord;
  const connected=Boolean(client?.isReady?.());
@@ -66,11 +66,11 @@ app.get('/api/discord/servers',(req,res)=>{
     members:Number.isFinite(botGuild?.memberCount)?botGuild.memberCount:null};
   }).sort((a,b)=>a.name.localeCompare(b.name,'fr'));
  res.json({connected,guilds,selectedGuildId:userSession.guildId||null});
-});
+}));
 // Public map index; private markers and custom map imagery are only returned
 // for the authorized Discord guild selected in the administrator's session.
 app.get('/api/maps/explorer',controller(async(req,res)=>{
- const active=session(req);
+ const active=await session(req);
  if(!active?.guildId||!active.guilds?.some(g=>g.id===active.guildId)){
   return res.json({maps:BASE_MAPS,features:[],scope:'public',dataStatus:'catalog-only'});
  }
@@ -87,7 +87,7 @@ app.post('/api/morse/decode',controller(async(req,res)=>{
 }));
 app.get('/api/auth/start',oauthStart);
 app.get('/api/auth/callback',controller(oauthCallback));
-app.get('/api/session',(req,res)=>res.json(sessionInfo(req)));
+app.get('/api/session',controller(async(req,res)=>res.json(await sessionInfo(req))));
 app.post('/api/logout',authRequired,csrfRequired,logout);
 app.post('/api/select-guild',authRequired,csrfRequired,selectGuild);
 
