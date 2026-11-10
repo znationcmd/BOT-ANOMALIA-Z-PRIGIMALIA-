@@ -8,11 +8,12 @@ import {BASE_MAPS,buildMapExplorer,safeImageUrl,safeTierZones} from '../lib/map-
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=file=>readFile(path.join(root,file),'utf8');
 
-test('catalog contains only the nineteen ANOMALIA’Z PRIGIMALIA maps',()=>{
+test('catalog contains all twenty-three ANOMALIA’Z PRIGIMALIA maps',()=>{
  const original=['SKARVIK','DRAZOVIA','KARSKOV','VORGRAD','NEMORIS','DRAKHEIM','SOLYNACALYRA',
  'NEXAVARKHOS','CHERNASKALUXRIA','F.A.L.C','KOLCHIEM ORIGINS'];
- const added=['ROSКАТVIA-B1','НОГОКВ-51','PARADISIOMANIA','DEADROOT','YUDINAVIA','MOSCOVIE','CORSIVIA','БОТ СЕВЕР'];
- assert.equal(BASE_MAPS.length,19);
+ const added=['ROSКАТVIA-B1','НОГОКВ-51','PARADISIOMANIA','DEADROOT','YUDINAVIA','MOSCOVIE','CORSIVIA','БОТ СЕВЕР',
+ 'RACCONIA-VARKOVIA','UNKNOWN HORROR X','KÖNIGSBRÜCK','SKJÆRØYÅS'];
+ assert.equal(BASE_MAPS.length,23);
  assert.deepEqual(new Set(BASE_MAPS.map(m=>m.name)),new Set([...original,...added]));
  assert.ok(BASE_MAPS.every(m=>m.family.startsWith('ANOMALIA’Z')&&m.imageUrl===null&&m.width===null));
  for(const foreign of ['Chernarus+','Livonia','Sakhal','Deer Isle','Namalsk'])assert.ok(!BASE_MAPS.some(m=>m.name===foreign));
@@ -49,7 +50,7 @@ test('reject external game maps, invalid image URLs and impossible coordinates',
         {name:'Sans coordonnées',map:'DRAZOVIA'},
         {name:'Autre jeu',map:'Chernarus+',x:20,z:20}]
  });
- assert.equal(out.maps.length,19);
+ assert.equal(out.maps.length,23);
  assert.ok(!out.maps.some(m=>m.name==='Chernarus+'));
  assert.equal(out.features.length,0);
 });
@@ -104,4 +105,26 @@ test('regional scripts and area shares remain authored labels, never fabricated 
  assert.equal(out.maps.find(m=>m.id==='vorgrad').localityNaming.direction,'rtl');
  assert.ok(out.maps.find(m=>m.id==='vorgrad').localityNaming.cityNames.every(n=>/\p{Script=Arabic}/u.test(n)));
  assert.equal(out.maps.find(m=>m.id==='corsivia').localityNaming.language,'co');
+});
+
+
+test('German and Nordic maps appear without fake images, with unicode aliases scoped per guild',()=>{
+ const expected=[['UNKNOWN HORROR X','20 × 20 km'],['KÖNIGSBRÜCK','30 × 30 km'],['SKJÆRØYÅS','15 × 15 km']];
+ for(const [name,size] of expected){
+  const m=BASE_MAPS.find(x=>x.name===name);
+  assert.equal(m.size,size);
+  assert.equal(m.imageUrl,null);
+  assert.equal(m.configured,false);
+  assert.deepEqual(m.tierZones,[]);
+ }
+ const out=buildMapExplorer({
+  guildMaps:[{name:'SKJÆRØYÅS',width:15000,height:15000,imageUrl:'https://example.org/nordic.png'}],
+  locations:[{name:'Åshamn',map:'SKJÆRØYÅS',x:5000,z:6000}],
+  loot:[{name:'Poisson',map:'skjaeroyaas',x:500,z:600}],
+  vehicles:[{name:'Motoneige',map:'SKJAEROYAAS',x:8000,z:8500}]
+ });
+ const nordic=out.maps.find(x=>x.id==='skjaeroyaas');
+ assert.equal(nordic.configured,true);
+ assert.deepEqual(out.features.map(x=>x.mapId),['skjaeroyaas','skjaeroyaas','skjaeroyaas']);
+ assert.equal(buildMapExplorer().features.length,0,'public catalog must not leak guild data');
 });

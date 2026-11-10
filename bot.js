@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import {Client,GatewayIntentBits,SlashCommandBuilder,PermissionFlagsBits,MessageFlags} from 'discord.js';
 import {createRecord,listRecords,mutateGuild,readGuildData} from './lib/store.js';
 import {BUNKERS,decodeMorse} from './lib/game-data.js';
+import {BASE_MAPS} from './lib/map-catalog.js';
 
 const commands=[
  new SlashCommandBuilder().setName('anomalia').setDescription('ANOMALIA’Z PRIGIMALIA : serveur, outils et Dashboard')
@@ -24,6 +25,7 @@ const commands=[
     .addChoices({name:'Clé',value:'key'},{name:'Carte perforée',value:'card'},{name:'Code Morse',value:'morse'}))),
  new SlashCommandBuilder().setName('morse').setDescription('Décoder une transmission Morse enregistrée en jeu')
   .addStringOption(o=>o.setName('signal').setDescription('10 chiffres ou groupes de points/traits séparés').setRequired(true).setMaxLength(350)),
+ new SlashCommandBuilder().setName('cartes').setDescription('Catalogue des 23 cartes ANOMALIA’Z PRIGIMALIA'),
  new SlashCommandBuilder().setName('ticket').setDescription('Ouvrir un ticket ANOMALIA')
   .addStringOption(o=>o.setName('sujet').setDescription('Sujet du ticket').setRequired(true).setMaxLength(180))
   .addStringOption(o=>o.setName('message').setDescription('Description du problème').setRequired(true).setMaxLength(1300)),
@@ -40,6 +42,10 @@ async function handle(interaction){
   if(sub==='editor')return privateResponse(interaction,'🛠️ ANOMALIA Éditor pour ton serveur Discord : '+(dash()?dash()+'/#editor':'Dashboard à configurer'));
   if(sub==='tools')return privateResponse(interaction,'🧰 ANOMALIA Tools pour ta communauté : '+(dash()?dash()+'/#tools':'Dashboard à configurer'));
   return privateResponse(interaction,'🤖 **ANOMALIA’Z PRIGIMALIA**\nBot Discord multi-serveurs : connecté\nConfiguration indépendante pour chaque communauté.\nDashboard : '+(dash()||'domaine à configurer'));
+ }
+ if(name==='cartes'){
+  const list=BASE_MAPS.map(m=>'• '+m.name+' — '+(m.size||'surface en définition')).join('\n');
+  return privateResponse(interaction,'🗺️ **23 cartes ANOMALIA’Z PRIGIMALIA** (catalogue de projet)\n'+list+'\n\n⚠️ La présence ici ne prouve pas leur import UE5. Atlas interactif : '+(dash()?dash()+'/#maps':'Dashboard à configurer'));
  }
  if(name==='whitelist'){
   const already=(await listRecords(guildId,'whitelist')).find(x=>x.playerId===user.id&&x.status==='pending');
